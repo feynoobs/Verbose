@@ -3,6 +3,7 @@ package jp.co.fssoft.verbose.activity
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import jp.co.fssoft.verbose.R
 import jp.co.fssoft.verbose.database.DatabaseHelper
 
 /**
@@ -36,5 +37,6 @@ open class RootActivity : AppCompatActivity()
     {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "[START]onCreate(${savedInstanceState})")
+        setContentView(R.layout.root_activity)
     }
 }
