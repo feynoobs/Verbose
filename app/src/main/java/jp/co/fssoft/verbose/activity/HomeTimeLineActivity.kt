@@ -34,7 +34,13 @@ class HomeTimeLineActivity : RootActivity()
         val contents: LinearLayout = findViewById(R.id.contents)
         contents.removeAllViews()
         layoutInflater.inflate(R.layout.home_time_line_activity, contents)
+    }
 
+    override fun onStart()
+    {
+        super.onStart()
+
+        Log.d(TAG, "[START]onStart()")
         /***********************************************
          * ユーザーデータがあるか確認する
          * なければ認証
