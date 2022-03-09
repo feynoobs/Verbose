@@ -7,6 +7,7 @@
         <entry key="app/src/main/res/layout/authentication_activity.xml" value="0.17451874366767983" />
         <entry key="app/src/main/res/layout/home_time_line_activity.xml" value="0.14947916666666666" />
         <entry key="app/src/main/res/layout/root_activity.xml" value="0.14947916666666666" />
+        <entry key="app/src/main/res/layout/tweet_recycler_view_item.xml" value="0.1390625" />
       </map>
     </option>
   </component>
