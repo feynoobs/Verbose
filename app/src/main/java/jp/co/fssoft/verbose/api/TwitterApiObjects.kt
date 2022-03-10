@@ -14,7 +14,7 @@ data class TweetObject(
     @SerialName("in_reply_to_status_id") val replyTweetId: Long?,
 //    @SerialName("in_reply_to_user_id") val replyUserId: Long?,
 //    @SerialName("in_reply_to_screen_name") val replyName: String?,
-    var user: UserObject? = null,
+    var user: UserObject,
     @SerialName("coordinates") val coordinate: CoordinateObject?,
     val place: PlaceObject?,
     @SerialName("quoted_status") val quotedTweet: TweetObject? = null,
