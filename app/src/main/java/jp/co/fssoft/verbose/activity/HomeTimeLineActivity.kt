@@ -4,7 +4,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.LinearLayout
+import androidx.recyclerview.widget.RecyclerView
 import jp.co.fssoft.verbose.R
+import jp.co.fssoft.verbose.widget.TweetRecyclerView
 
 /**
  * Home time line activity
@@ -48,6 +50,12 @@ class HomeTimeLineActivity : RootActivity()
         database.readableDatabase.rawQuery("SELECT * FROM t_users WHERE current = ?", arrayOf("1")).use {
             if (it.count == 0) {
                 startActivity(Intent(application, AuthenticationActivity::class.java))
+            }
+            else {
+                findViewById<RecyclerView>(R.id.tweet_recycler_view).apply {
+                    setHasFixedSize(true)
+                    adapter = TweetRecyclerView()
+                }
             }
         }
     }

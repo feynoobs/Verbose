@@ -166,14 +166,14 @@ class TweetViewHolder(view: View) : RecyclerView.ViewHolder(view)
  *
  * @constructor Create empty Tweet recycle view
  */
-class TweetRecycleView : RecyclerView.Adapter<TweetViewHolder>()
+class TweetRecyclerView(private val userId: Long) : RecyclerView.Adapter<TweetViewHolder>()
 {
     companion object
     {
         /**
          * T a g
          */
-        private val TAG = TweetRecycleView::class.qualifiedName
+        private val TAG = TweetRecyclerView::class.qualifiedName
     }
 
     /**
