@@ -262,7 +262,7 @@ class TweetRecyclerView(private val userId: Long) : RecyclerView.Adapter<TweetVi
  * @property bottom
  * @constructor Create empty Tweet scroll event
  */
-internal class TweetScrollEvent(private val userId: Long, private val top: ((Long, ()->Unit)->Unit)? = null, private val bottom: ((Long, ()->Unit)->Unit)? = null) : RecyclerView.OnScrollListener()
+internal class TweetScrollEvent(private val userId: Long, private val adapter: TweetRecyclerView, private val top: ((Long, TweetRecyclerView, ()->Unit)->Unit)? = null, private val bottom: ((Long, TweetRecyclerView, ()->Unit)->Unit)? = null) : RecyclerView.OnScrollListener()
 {
     companion object
     {
@@ -313,7 +313,7 @@ internal class TweetScrollEvent(private val userId: Long, private val top: ((Lon
                 top?.let {
                     if (topLock == false) {
                         topLock = true
-                        it(userId, ::topUnlock)
+                        it(userId, adapter, ::topUnlock)
                     }
                 }
             }
@@ -323,7 +323,7 @@ internal class TweetScrollEvent(private val userId: Long, private val top: ((Lon
             bottom?.let {
                 if (bottomLock == false) {
                     bottomLock = true
-                    it(userId, ::bottomUnlock)
+                    it(userId, adapter, ::bottomUnlock)
                 }
             }
         }
@@ -339,10 +339,9 @@ internal class TweetScrollEvent(private val userId: Long, private val top: ((Lon
     {
         super.onScrollStateChanged(recyclerView, newState)
 
-        Log.d(TAG, "[START]onScrollStateChanged(${recyclerView}, ${newState})")
+        Log.d(TAG, "onScrollStateChanged(${recyclerView}, ${newState})")
         if (newState == AbsListView.OnScrollListener.SCROLL_STATE_FLING) {
             reload(recyclerView)
         }
-        Log.d(TAG, "[START]onScrollStateChanged(${recyclerView}, ${newState})")
     }
 }

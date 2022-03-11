@@ -56,9 +56,9 @@ open class RootActivity : AppCompatActivity()
         database.readableDatabase.rawQuery(query, arrayOf(userId.toString())).use {
             var movable = it.moveToFirst()
             while (movable) {
-                movable = it.moveToNext()
                 val tweetObject = Json.jsonDecode(TweetObject.serializer(), it.getString(it.getColumnIndexOrThrow("data")))
                 tweetObjects.add(tweetObject)
+                movable = it.moveToNext()
             }
         }
 

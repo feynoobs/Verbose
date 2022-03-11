@@ -4,6 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.LinearLayout
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import jp.co.fssoft.verbose.R
 import jp.co.fssoft.verbose.widget.TweetRecyclerView
@@ -31,10 +33,30 @@ class HomeTimeLineActivity : RootActivity()
      * @param callback
      * @receiver
      */
-    private fun upperScroll(userId: Long, callback: ()->Unit)
+    private fun upperScroll(userId: Long, adapter: TweetRecyclerView, callback: ()->Unit)
     {
         val prevData = getCurrentHomeTweet(userId)
-        callback()
+        var diff = 0
+        getNextHomeTweet(userId, false) {
+            adapter.tweetObjects = getCurrentHomeTweet(userId)
+            for (i in 0 until adapter.tweetObjects.size) {
+                if (adapter.tweetObjects[i].id > prevData[0].id) {
+                    ++diff
+                }
+                else {
+                    break
+                }
+            }
+            if (diff > 0) {
+                runOnUiThread {
+                    adapter.notifyItemRangeInserted(0, diff)
+                    callback()
+                }
+            }
+            else {
+                callback()
+            }
+        }
     }
 
     /**
@@ -43,11 +65,31 @@ class HomeTimeLineActivity : RootActivity()
      * @param callback
      * @receiver
      */
-    private fun lowerScroll(userId: Long, callback: ()->Unit)
+    private fun lowerScroll(userId: Long, adapter: TweetRecyclerView, callback: ()->Unit)
     {
-        callback()
+        val prevData = getCurrentHomeTweet(userId)
+        var diff = 0
+        getPrevHomeTweet(userId, false) {
+            adapter.tweetObjects = getCurrentHomeTweet(userId)
+            for (i in 0 until adapter.tweetObjects.size) {
+                if (adapter.tweetObjects[i].id < prevData[prevData.size - 1].id) {
+                    ++diff
+                }
+                else {
+                    break
+                }
+            }
+            if (diff > 0) {
+                runOnUiThread {
+                    adapter.notifyItemRangeInserted(prevData.size - 1, diff)
+                    callback()
+                }
+            }
+            else {
+                callback()
+            }
+        }
     }
-
 
     /**
      * On create
@@ -81,9 +123,17 @@ class HomeTimeLineActivity : RootActivity()
                 it.moveToFirst()
                 findViewById<RecyclerView>(R.id.tweet_recycler_view).apply {
                     setHasFixedSize(true)
+                    layoutManager = LinearLayoutManager(this@HomeTimeLineActivity, LinearLayoutManager.VERTICAL, false)
                     val userId = it.getLong(it.getColumnIndexOrThrow("user_id"))
                     adapter = TweetRecyclerView(userId)
-                    addOnScrollListener(TweetScrollEvent(userId, ::upperScroll, ::lowerScroll))
+                    addItemDecoration(DividerItemDecoration(applicationContext, DividerItemDecoration.VERTICAL))
+                    addOnScrollListener(TweetScrollEvent(userId, adapter as TweetRecyclerView, ::upperScroll, ::lowerScroll))
+
+                    // debug
+                    (adapter as TweetRecyclerView).tweetObjects = getCurrentHomeTweet(userId)
+                    runOnUiThread {
+                        adapter?.notifyDataSetChanged()
+                    }
                 }
             }
         }
