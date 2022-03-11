@@ -7,6 +7,7 @@ import android.widget.LinearLayout
 import androidx.recyclerview.widget.RecyclerView
 import jp.co.fssoft.verbose.R
 import jp.co.fssoft.verbose.widget.TweetRecyclerView
+import jp.co.fssoft.verbose.widget.TweetScrollEvent
 
 /**
  * Home time line activity
@@ -22,6 +23,31 @@ class HomeTimeLineActivity : RootActivity()
          */
         private val TAG = HomeTimeLineActivity::class.qualifiedName
     }
+
+    /**
+     * Upper scroll
+     *
+     * @param userId
+     * @param callback
+     * @receiver
+     */
+    private fun upperScroll(userId: Long, callback: ()->Unit)
+    {
+        val prevData = getCurrentHomeTweet(userId)
+        callback()
+    }
+
+    /**
+     * Lower scroll
+     *
+     * @param callback
+     * @receiver
+     */
+    private fun lowerScroll(userId: Long, callback: ()->Unit)
+    {
+        callback()
+    }
+
 
     /**
      * On create
@@ -52,9 +78,12 @@ class HomeTimeLineActivity : RootActivity()
                 startActivity(Intent(application, AuthenticationActivity::class.java))
             }
             else {
+                it.moveToFirst()
                 findViewById<RecyclerView>(R.id.tweet_recycler_view).apply {
                     setHasFixedSize(true)
-                    adapter = TweetRecyclerView()
+                    val userId = it.getLong(it.getColumnIndexOrThrow("user_id"))
+                    adapter = TweetRecyclerView(userId)
+                    addOnScrollListener(TweetScrollEvent(::upperScroll, ::lowerScroll))
                 }
             }
         }

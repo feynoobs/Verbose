@@ -262,7 +262,7 @@ class TweetRecyclerView(private val userId: Long) : RecyclerView.Adapter<TweetVi
  * @property bottom
  * @constructor Create empty Tweet scroll event
  */
-internal class TweetScrollEvent(private val top: ((()->Unit)->Unit)? = null, private val bottom: ((()->Unit)->Unit)? = null) : RecyclerView.OnScrollListener()
+internal class TweetScrollEvent(private val userId: Long, private val top: ((Long, ()->Unit)->Unit)? = null, private val bottom: ((Long, ()->Unit)->Unit)? = null) : RecyclerView.OnScrollListener()
 {
     companion object
     {
@@ -313,7 +313,7 @@ internal class TweetScrollEvent(private val top: ((()->Unit)->Unit)? = null, pri
                 top?.let {
                     if (topLock == false) {
                         topLock = true
-                        it(::topUnlock)
+                        it(userId, ::topUnlock)
                     }
                 }
             }
@@ -323,7 +323,7 @@ internal class TweetScrollEvent(private val top: ((()->Unit)->Unit)? = null, pri
             bottom?.let {
                 if (bottomLock == false) {
                     bottomLock = true
-                    it(::bottomUnlock)
+                    it(userId, ::bottomUnlock)
                 }
             }
         }

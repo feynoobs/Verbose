@@ -29,6 +29,43 @@ open class RootActivity : AppCompatActivity()
     }
 
     /**
+     * Get current home tweet
+     *
+     * @param userId
+     * @return
+     */
+    protected fun getCurrentHomeTweet(userId: Long) : List<TweetObject>
+    {
+        val tweetObjects = mutableListOf<TweetObject>()
+        val query =
+            """
+                SELECT 
+                    t_time_lines.user_id, t_time_lines.data 
+                FROM 
+                    t_time_lines
+                INNER JOIN
+                    r_home_tweets
+                ON
+                    r_home_tweets.user_id = ? AND t_time_lines.tweet_id = r_home_tweets.tweet_id
+                WHERE
+                    t_time_lines.reply_tweet_id IS NULL
+                ORDER BY
+                    t_time_lines.tweet_id
+                DESC
+            """
+        database.readableDatabase.rawQuery(query, arrayOf(userId.toString())).use {
+            var movable = it.moveToFirst()
+            while (movable) {
+                movable = it.moveToNext()
+                val tweetObject = Json.jsonDecode(TweetObject.serializer(), it.getString(it.getColumnIndexOrThrow("data")))
+                tweetObjects.add(tweetObject)
+            }
+        }
+
+        return tweetObjects
+    }
+
+    /**
      * Get tweets common
      *
      * @param api
