@@ -83,7 +83,7 @@ class HomeTimeLineActivity : RootActivity()
                     setHasFixedSize(true)
                     val userId = it.getLong(it.getColumnIndexOrThrow("user_id"))
                     adapter = TweetRecyclerView(userId)
-                    addOnScrollListener(TweetScrollEvent(::upperScroll, ::lowerScroll))
+                    addOnScrollListener(TweetScrollEvent(userId, ::upperScroll, ::lowerScroll))
                 }
             }
         }
