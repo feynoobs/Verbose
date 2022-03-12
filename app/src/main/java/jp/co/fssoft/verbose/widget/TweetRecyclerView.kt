@@ -1,6 +1,7 @@
 package jp.co.fssoft.verbose.widget
 
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,7 +13,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import jp.co.fssoft.verbose.R
 import jp.co.fssoft.verbose.api.TweetObject
+import jp.co.fssoft.verbose.utility.Imager
 import jp.co.fssoft.verbose.utility.Utility
+import java.io.FileInputStream
 
 /**
  * Tweet view holder
@@ -227,6 +230,22 @@ class TweetRecyclerView(private val userId: Long) : RecyclerView.Adapter<TweetVi
             else {
                 tweet.retweetedTweet.text
             }
+        if (tweet.retweetedTweet == null) {
+            Imager().loadImage(holder.icon.context, tweet.user?.profileImageUrl!!, Imager.Companion.ImagePrefix.USER) {
+                holder.icon.post {
+                    holder.icon.setImageBitmap(Utility.circleTransform(BitmapFactory.decodeStream(
+                        FileInputStream(it)
+                    )))
+                }
+            }
+        }
+        else {
+            Imager().loadImage(holder.icon.context, tweet.retweetedTweet.user?.profileImageUrl!!, Imager.Companion.ImagePrefix.USER) {
+                holder.icon.post {
+                    holder.icon.setImageBitmap(Utility.circleTransform(BitmapFactory.decodeStream(FileInputStream(it))))
+                }
+            }
+        }
         holder.favoriteBtn.setImageResource(R.drawable.tweet_favorite)
         if (tweet.isFavorited == true) {
             holder.favoriteBtn.setImageResource(R.drawable.tweet_favorited)
@@ -241,6 +260,10 @@ class TweetRecyclerView(private val userId: Long) : RecyclerView.Adapter<TweetVi
             if (tweet.retweetedTweet.favorites != 0) {
                 holder.favoriteText.text = String.format("%,d", tweet.retweetedTweet?.favorites)
             }
+        }
+        holder.retweetBtn.setImageResource(R.drawable.tweet_retweet)
+        if (tweet.retweeted == true) {
+            holder.retweetBtn.setImageResource(R.drawable.tweet_retweeted)
         }
     }
 
