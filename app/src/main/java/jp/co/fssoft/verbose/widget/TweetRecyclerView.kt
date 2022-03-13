@@ -193,7 +193,7 @@ class TweetRecyclerView(private val userId: Long) : RecyclerView.Adapter<TweetVi
      */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TweetViewHolder
     {
-        Log.d(TAG, "onCreateViewHolder(${parent}, ${viewType})")
+        Log.v(TAG, "onCreateViewHolder(${parent}, ${viewType})")
         return TweetViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.tweet_recycler_view_item, parent, false))
     }
 
@@ -205,7 +205,7 @@ class TweetRecyclerView(private val userId: Long) : RecyclerView.Adapter<TweetVi
      */
     override fun onBindViewHolder(holder: TweetViewHolder, position: Int)
     {
-        Log.d(TAG, "onBindViewHolder(${holder}, ${position})")
+        Log.v(TAG, "onBindViewHolder(${holder}, ${position})")
         val tweet = tweetObjects[position]
 
         holder.nameText.text =
@@ -231,7 +231,7 @@ class TweetRecyclerView(private val userId: Long) : RecyclerView.Adapter<TweetVi
                 tweet.retweetedTweet.text
             }
         if (tweet.retweetedTweet == null) {
-            Imager().loadImage(holder.icon.context, tweet.user?.profileImageUrl!!, Imager.Companion.ImagePrefix.USER) {
+            Imager().loadImage(holder.icon.context, tweet.user.profileImageUrl, Imager.Companion.ImagePrefix.USER) {
                 holder.icon.post {
                     holder.icon.setImageBitmap(Utility.circleTransform(BitmapFactory.decodeStream(
                         FileInputStream(it)
@@ -240,7 +240,7 @@ class TweetRecyclerView(private val userId: Long) : RecyclerView.Adapter<TweetVi
             }
         }
         else {
-            Imager().loadImage(holder.icon.context, tweet.retweetedTweet.user?.profileImageUrl!!, Imager.Companion.ImagePrefix.USER) {
+            Imager().loadImage(holder.icon.context, tweet.retweetedTweet.user.profileImageUrl, Imager.Companion.ImagePrefix.USER) {
                 holder.icon.post {
                     holder.icon.setImageBitmap(Utility.circleTransform(BitmapFactory.decodeStream(FileInputStream(it))))
                 }
@@ -352,6 +352,27 @@ internal class TweetScrollEvent(private val userId: Long, private val adapter: T
         }
     }
 
+    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int)
+    {
+        super.onScrolled(recyclerView, dx, dy)
+        if (recyclerView.canScrollVertically(-1) == false) {
+            top?.let {
+                if (topLock == false) {
+                    topLock = true
+                    it(userId, adapter, ::topUnlock)
+                }
+            }
+        }
+        if (recyclerView.canScrollVertically(1) == false) {
+            bottom?.let {
+                if (bottomLock == false) {
+                    bottomLock = true
+                    it(userId, adapter, ::bottomUnlock)
+                }
+            }
+        }
+    }
+
     /**
      * TODO
      *
@@ -361,10 +382,6 @@ internal class TweetScrollEvent(private val userId: Long, private val adapter: T
     override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int)
     {
         super.onScrollStateChanged(recyclerView, newState)
-
-        Log.d(TAG, "onScrollStateChanged(${recyclerView}, ${newState})")
-        if (newState == AbsListView.OnScrollListener.SCROLL_STATE_FLING) {
-            reload(recyclerView)
-        }
+        Log.v(TAG, "onScrollStateChanged(${recyclerView}, ${newState})")
     }
 }

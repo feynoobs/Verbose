@@ -106,7 +106,6 @@ data class PollOptionObject(
 @Serializable
 data class CoordinateObject(
     @SerialName("coordinates") val coordinate: List<Float>,
-    val text: String
 )
 
 @Serializable
