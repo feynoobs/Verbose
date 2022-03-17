@@ -40,7 +40,7 @@ class TwitterApiStatusesHomeTimeline(private val userId: Long, private val db: S
     }
 
     /**
-     * TODO
+     * Finish
      *
      * @param result
      */
@@ -57,10 +57,10 @@ class TwitterApiStatusesHomeTimeline(private val userId: Long, private val db: S
                     var values = ContentValues()
                     val userIdFromTweet =
                         if (it.retweetedTweet == null) {
-                            it.user?.id
+                            it.user.id
                         }
                         else {
-                            it.retweetedTweet.user!!.id
+                            it.retweetedTweet.user.id
                         }
                     val userDataFromTweet =
                         if (it.retweetedTweet == null) {
@@ -71,7 +71,7 @@ class TwitterApiStatusesHomeTimeline(private val userId: Long, private val db: S
                         }
 
                     values.put("user_id", userIdFromTweet)
-                    values.put("data", Json.jsonEncode(UserObject.serializer(), userDataFromTweet!!))
+                    values.put("data", Json.jsonEncode(UserObject.serializer(), userDataFromTweet))
                     values.put("updated_at", Utility.now())
                     db.rawQuery("SELECT id FROM t_users WHERE user_id = ?", arrayOf(userIdFromTweet.toString())).use {
                         if (it.count == 1) {
@@ -90,7 +90,7 @@ class TwitterApiStatusesHomeTimeline(private val userId: Long, private val db: S
                     values = ContentValues()
                     values.put("tweet_id", it.id)
                     values.put("reply_tweet_id", it.replyTweetId)
-                    values.put("user_id", it.user?.id)
+                    values.put("user_id", it.user.id)
                     values.put("data", Json.jsonEncode(TweetObject.serializer(), it))
                     values.put("created_at", Utility.now())
                     values.put("updated_at", Utility.now())

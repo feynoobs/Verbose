@@ -47,8 +47,6 @@ open class RootActivity : AppCompatActivity()
                     r_home_tweets
                 ON
                     r_home_tweets.user_id = ? AND t_time_lines.tweet_id = r_home_tweets.tweet_id
-                WHERE
-                    t_time_lines.reply_tweet_id IS NULL
                 ORDER BY
                     t_time_lines.tweet_id
                 DESC

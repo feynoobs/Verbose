@@ -15,8 +15,8 @@ class DatabaseHelper(context: Context): SQLiteOpenHelper(context, "verbose.db", 
                         user_id INTEGER NOT NULL,
                         oauth_token TEXT DEFAULT NULL,
                         oauth_token_secret TEXT DEFAULT NULL,
-                        my INTEGER DEFAULT NULL,
                         current INTEGER DEFAULT NULL,
+                        
                         data JSON,
                         created_at TEXT NOT NULL,
                         updated_at TEXT NOT NULL 
@@ -26,16 +26,6 @@ class DatabaseHelper(context: Context): SQLiteOpenHelper(context, "verbose.db", 
         db?.execSQL(
             """
                 CREATE UNIQUE INDEX unique_user_id ON t_users (user_id)
-            """
-        )
-        db?.execSQL(
-            """
-                CREATE UNIQUE INDEX unique_my ON t_users (my)
-            """
-        )
-        db?.execSQL(
-            """
-                CREATE UNIQUE INDEX unique_current ON t_users (current)
             """
         )
         db?.execSQL(

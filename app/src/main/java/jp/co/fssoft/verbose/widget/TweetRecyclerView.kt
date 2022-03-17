@@ -15,6 +15,7 @@ import jp.co.fssoft.verbose.R
 import jp.co.fssoft.verbose.api.TweetObject
 import jp.co.fssoft.verbose.utility.Imager
 import jp.co.fssoft.verbose.utility.Utility
+import org.w3c.dom.Text
 import java.io.FileInputStream
 
 /**
@@ -75,44 +76,54 @@ class TweetViewHolder(view: View) : RecyclerView.ViewHolder(view)
     val retweetBtn: ImageButton = view.findViewById(R.id.tweet_recycler_view_retweet_button)
 
     /**
-     * Retweet btn
+     * Retweet text
      */
     val retweetText: TextView = view.findViewById(R.id.tweet_recycler_view_retweet_count)
 
     /**
-     * Retweet btn
+     * Favorite btn
      */
     val favoriteBtn: ImageButton = view.findViewById(R.id.tweet_recycler_view_favorite_button)
 
     /**
-     * Retweet btn
+     * Favorite text
      */
     val favoriteText: TextView = view.findViewById(R.id.tweet_recycler_view_favorite_count)
 
     /**
-     * Retweet btn
+     * Transfer btn
      */
     val transferBtn: ImageButton = view.findViewById(R.id.tweet_recycler_view_transfer_button)
 
     /**
-     * Retweet btn
+     * Other btn
      */
     val otherBtn: ImageButton = view.findViewById(R.id.tweet_recycler_view_other_button)
 
     /**
-     * Retweet btn
+     * Share btn
      */
     val shareBtn: ImageButton = view.findViewById(R.id.tweet_recycler_view_share_button)
 
     /**
-     * Retweet btn
+     * Space
      */
     private val space: Space = view.findViewById(R.id.tweet_recycler_view_space)
 
     /**
-     * Retweet btn
+     * Media layout
      */
     val mediaLayout: LinearLayout = view.findViewById(R.id.tweet_media_layout)
+
+    /**
+     * Reply image
+     */
+    val replyImage: ImageView = view.findViewById(R.id.tweet_recycler_view_reply_image)
+
+    /**
+     * Reply name
+     */
+    val replyName: TextView = view.findViewById(R.id.tweet_recycler_view_reply_name)
 
     init
     {

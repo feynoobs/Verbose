@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.ImageButton
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -54,6 +55,7 @@ class HomeTimeLineActivity : RootActivity()
                 runOnUiThread {
                     adapter.notifyItemRangeInserted(0, diff)
                     callback()
+                    Toast.makeText(applicationContext, resources.getString(R.string.new_tweet), Toast.LENGTH_LONG).show()
                 }
             }
             else {
@@ -155,11 +157,6 @@ class HomeTimeLineActivity : RootActivity()
                             runOnUiThread {
                                 adapter?.notifyDataSetChanged()
                             }
-                        }
-                    }
-                    else {
-                        runOnUiThread {
-                            adapter?.notifyDataSetChanged()
                         }
                     }
                 }
