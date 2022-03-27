@@ -19,7 +19,7 @@ class TwitterApiStatusesHomeTimeline(private val my: Long, private val db: SQLit
     companion object
     {
         /**
-         *
+         * Tag
          */
         private val TAG = TwitterApiStatusesHomeTimeline::class.qualifiedName
     }

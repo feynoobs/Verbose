@@ -38,7 +38,7 @@ class TwitterApiFavoritesCreate(private val db: SQLiteDatabase) : TwitterApiComm
     }
 
     /**
-     * TODO
+     * Finish
      *
      * @param result
      */

@@ -55,7 +55,7 @@ class TwitterApiUsersShow(private val db: SQLiteDatabase) : TwitterApiCommon("ht
     }
 
     /**
-     * TODO
+     * Finish
      *
      * @param result
      */

@@ -4,6 +4,13 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
+/**
+ * Database helper
+ *
+ * @constructor
+ *
+ * @param context
+ */
 class DatabaseHelper(context: Context): SQLiteOpenHelper(context, "verbose.db", null, 1)
 {
     override fun onCreate(db: SQLiteDatabase?)
@@ -85,6 +92,13 @@ class DatabaseHelper(context: Context): SQLiteOpenHelper(context, "verbose.db", 
         )
     }
 
+    /**
+     * On upgrade
+     *
+     * @param db
+     * @param oldVersion
+     * @param newVersion
+     */
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int)
     {
         TODO("Not yet implemented")

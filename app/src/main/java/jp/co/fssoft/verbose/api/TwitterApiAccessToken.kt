@@ -14,7 +14,7 @@ class TwitterApiAccessToken(private val db: SQLiteDatabase) : TwitterApiCommon("
     companion object
     {
         /**
-         *
+         * Tag
          */
         private val TAG = TwitterApiAccessToken::class.qualifiedName
     }

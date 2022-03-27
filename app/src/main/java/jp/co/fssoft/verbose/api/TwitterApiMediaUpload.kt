@@ -13,6 +13,12 @@ class TwitterApiMediaUpload(db: SQLiteDatabase) : TwitterApiCommon("https://uplo
         private val TAG = TwitterApiMediaUpload::class.qualifiedName
     }
 
+    /**
+     * Start
+     *
+     * @param additionalHeaderParams
+     * @return
+     */
     override fun start(additionalHeaderParams: Map<String, String>?): TwitterApiCommon
     {
         Log.v(TAG, "[START]start(${additionalHeaderParams})")
@@ -21,6 +27,11 @@ class TwitterApiMediaUpload(db: SQLiteDatabase) : TwitterApiCommon("https://uplo
         return this
     }
 
+    /**
+     * Finish
+     *
+     * @param result
+     */
     override fun finish(result: String?)
     {
         Log.v(TAG, "[START]finish(${result})")

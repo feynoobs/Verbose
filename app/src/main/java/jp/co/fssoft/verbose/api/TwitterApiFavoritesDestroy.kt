@@ -41,7 +41,7 @@ class TwitterApiFavoritesDestroy(private val db: SQLiteDatabase) : TwitterApiCom
     }
 
     /**
-     * TODO
+     * Finish
      *
      * @param result
      */

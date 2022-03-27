@@ -1,6 +1,5 @@
 package jp.co.fssoft.verbose.api
 
-
 import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
 import android.util.Log
@@ -40,7 +39,7 @@ class TwitterApiStatusesUserTimeline(private val db: SQLiteDatabase) : TwitterAp
     }
 
     /**
-     * TODO
+     * Finish
      *
      * @param result
      */

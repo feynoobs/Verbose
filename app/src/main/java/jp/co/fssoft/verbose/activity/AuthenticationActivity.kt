@@ -44,7 +44,7 @@ class AuthenticationActivity : AppCompatActivity()
      */
     private fun shouldOverrideUrlLoadingCommon(url: String, token: Map<String, String>)
     {
-        Log.d(TAG, "[START]shouldOverrideUrlLoadingCommon(${url}, ${token})")
+        Log.d(TAG, "shouldOverrideUrlLoadingCommon(${url}, ${token})")
         val query = url.replace("${TwitterApiCommon.CALLBACK_URL}?", "")
         val resultMap = Utility.splitQuery(query).toMutableMap()
         resultMap["oauth_token_secret"] = token["oauth_token_secret"] as String
@@ -52,10 +52,16 @@ class AuthenticationActivity : AppCompatActivity()
             val resultMap = Utility.splitQuery(it!!).toMutableMap()
             resultMap.remove("screen_name")
             TwitterApiUsersShow(database.writableDatabase).start(resultMap).callback = {
+                database.readableDatabase.rawQuery("SELECT MAX(my) as max FROM t_users", null).use {
+                    it.moveToFirst()
+                    val my = it.getLong(it.getColumnIndexOrThrow("max"))
+                    val edit = getPreferences(MODE_PRIVATE).edit()
+                    edit.putLong("my", my)
+                    edit.commit()
+                }
                 finish()
             }
         }
-        Log.d(TAG, "[END]shouldOverrideUrlLoadingCommon(${url}, ${token})")
     }
 
     /**
@@ -67,7 +73,7 @@ class AuthenticationActivity : AppCompatActivity()
     {
         super.onCreate(savedInstanceState)
 
-        Log.d(TAG, "[START]onCreate(${savedInstanceState})")
+        Log.d(TAG, "onCreate(${savedInstanceState})")
         setContentView(R.layout.authentication_activity)
         TwitterApiRequestToken(database.readableDatabase).start().callback = {
             val token = Utility.splitQuery(it!!)

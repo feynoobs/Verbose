@@ -126,6 +126,10 @@ class HomeTimeLineActivity : RootActivity()
         }
     }
 
+    /**
+     * On start
+     *
+     */
     override fun onStart()
     {
         super.onStart()

@@ -36,7 +36,7 @@ class TwitterApiRequestToken(private val db: SQLiteDatabase) : TwitterApiCommon(
 
 
     /**
-     * TODO
+     * Finish
      *
      * @param result
      */
