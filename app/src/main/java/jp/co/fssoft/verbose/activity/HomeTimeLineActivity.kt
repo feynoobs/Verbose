@@ -37,12 +37,12 @@ class HomeTimeLineActivity : RootActivity()
      * @param callback
      * @receiver
      */
-    private fun upperScroll(userId: Long, adapter: TweetRecyclerView, callback: ()->Unit)
+    private fun upperScroll(adapter: TweetRecyclerView, callback: ()->Unit)
     {
-        val prevData = getCurrentHomeTweet(userId)
+        val prevData = getCurrentHomeTweet()
         var diff = 0
-        getNextHomeTweet(userId, false) {
-            adapter.tweetObjects = getCurrentHomeTweet(userId)
+        getNextHomeTweet(false) {
+            adapter.tweetObjects = getCurrentHomeTweet()
             for (i in 0 until adapter.tweetObjects.size) {
                 if (adapter.tweetObjects[i].id > prevData[0].id) {
                     ++diff
@@ -70,12 +70,12 @@ class HomeTimeLineActivity : RootActivity()
      * @param callback
      * @receiver
      */
-    private fun lowerScroll(userId: Long, adapter: TweetRecyclerView, callback: ()->Unit)
+    private fun lowerScroll(adapter: TweetRecyclerView, callback: ()->Unit)
     {
-        val prevData = getCurrentHomeTweet(userId)
+        val prevData = getCurrentHomeTweet()
         var diff = 0
-        getPrevHomeTweet(userId, false) {
-            adapter.tweetObjects = getCurrentHomeTweet(userId)
+        getPrevHomeTweet(false) {
+            adapter.tweetObjects = getCurrentHomeTweet()
             for (i in (adapter.tweetObjects.size -1) downTo 0) {
                 if (adapter.tweetObjects[i].id < prevData[prevData.size - 1].id) {
                     ++diff
@@ -149,11 +149,11 @@ class HomeTimeLineActivity : RootActivity()
                     addItemDecoration(DividerItemDecoration(applicationContext, DividerItemDecoration.VERTICAL))
                     addOnScrollListener(TweetScrollEvent(userId, adapter as TweetRecyclerView, ::upperScroll, ::lowerScroll))
 
-                    (adapter as TweetRecyclerView).tweetObjects = getCurrentHomeTweet(userId)
+                    (adapter as TweetRecyclerView).tweetObjects = getCurrentHomeTweet()
                     // 0件だったらとりあえず取得する.初回起動時？
                     if ((adapter as TweetRecyclerView).tweetObjects.isEmpty() == true) {
-                        getNextHomeTweet(userId, false) {
-                            (adapter as TweetRecyclerView).tweetObjects = getCurrentHomeTweet(userId)
+                        getNextHomeTweet(false) {
+                            (adapter as TweetRecyclerView).tweetObjects = getCurrentHomeTweet()
                             runOnUiThread {
                                 adapter?.notifyDataSetChanged()
                             }

@@ -12,12 +12,14 @@ class DatabaseHelper(context: Context): SQLiteOpenHelper(context, "verbose.db", 
             """
                     CREATE TABLE t_users(
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        user_id INTEGER NOT NULL,
-                        oauth_token TEXT DEFAULT NULL,
-                        oauth_token_secret TEXT DEFAULT NULL,
-                        current INTEGER DEFAULT NULL,
+
+                        user_id INTEGER NOT NULL,               -- ユーザーID
+                        oauth_token TEXT DEFAULT NULL,          -- Twitter認証してもらう.NULLなら自分以外
+                        oauth_token_secret TEXT DEFAULT NULL,   -- Twitter認証してもらう.NULLなら自分以外
+                        my INTEGER DEFAULT NULL,                -- 自分の場合シーケンシャルな番号.他人ならNULL
                         
-                        data JSON,
+                        data JSON,                              -- ダウンロードされたJSONデータ
+                        
                         created_at TEXT NOT NULL,
                         updated_at TEXT NOT NULL 
                     )
@@ -30,13 +32,21 @@ class DatabaseHelper(context: Context): SQLiteOpenHelper(context, "verbose.db", 
         )
         db?.execSQL(
             """
+                CREATE UNIQUE INDEX unique_user_id ON t_users (my)
+            """
+        )
+
+        db?.execSQL(
+            """
                     CREATE TABLE t_time_lines(
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        tweet_id INTEGER NOT NULL,
-                        reply_tweet_id INTEGER DEFAULT NULL,
-                        retweet_id INTEGER DEFAULT NULL,
-                        user_id INTEGER NOT NULL,
-                        data JSON,
+                        
+                        tweet_id INTEGER NOT NULL,              -- ツィートID
+                        reply_tweet_id INTEGER DEFAULT NULL,    -- リプライの場合付与されるオリジナルツィートID
+                        user_id INTEGER NOT NULL,               -- ユーザーID
+                        
+                        data JSON,                              -- ダウンロードされたJSONデータ
+                        
                         created_at TEXT NOT NULL,
                         updated_at TEXT NOT NULL  
                     )
@@ -61,9 +71,8 @@ class DatabaseHelper(context: Context): SQLiteOpenHelper(context, "verbose.db", 
             """
                     CREATE TABLE r_home_tweets(
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        user_id INTEGER NOT NULL,
-                        tweet_id INTEGER NOT NULL,
-                        my INTEGER DEFAULT NULL,
+                        tweet_id INTEGER NOT NULL,                  -- ツィートID
+                        my INTEGER DEFAULT NULL,                    -- シーケンシャルな番号
                         created_at TEXT NOT NULL,
                         updated_at TEXT NOT NULL  
                     )
@@ -71,7 +80,7 @@ class DatabaseHelper(context: Context): SQLiteOpenHelper(context, "verbose.db", 
         )
         db?.execSQL(
             """
-                CREATE UNIQUE INDEX unique_user_id_tweet_id ON r_home_tweets (user_id, tweet_id)
+                CREATE UNIQUE INDEX unique_user_id_tweet_id ON r_home_tweets (my, tweet_id)
             """
         )
     }

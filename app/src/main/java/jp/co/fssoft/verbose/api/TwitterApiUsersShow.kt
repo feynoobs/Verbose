@@ -20,12 +20,12 @@ class TwitterApiUsersShow(private val db: SQLiteDatabase) : TwitterApiCommon("ht
          *
          */
         private val TAG = TwitterApiStatusesUserTimeline::class.qualifiedName
-
-        /**
-         * Additional params
-         */
-        private var additionalParams: Map<String, String>? = null
     }
+
+    /**
+     * Additional params
+     */
+    private var additionalParams: Map<String, String>? = null
 
     /**
      * Start
@@ -41,16 +41,15 @@ class TwitterApiUsersShow(private val db: SQLiteDatabase) : TwitterApiCommon("ht
         /***********************************************
          * 通常はDBから取得.認証時のみ引数.
          */
-        additionalHeaderParams!!["oauth_token"].let {
-            additionalHeaderParams!!["oauth_token_secret"].let {
+        additionalHeaderParams["oauth_token"].let {
+            additionalHeaderParams["oauth_token_secret"].let {
                 additionalParams = mapOf(
-                    "oauth_token" to additionalHeaderParams!!["oauth_token"]!!,
-                    "oauth_token_secret" to additionalHeaderParams!!["oauth_token_secret"]!!
+                    "oauth_token" to additionalHeaderParams["oauth_token"]!!,
+                    "oauth_token_secret" to additionalHeaderParams["oauth_token_secret"]!!
                 )
             }
         }
         startMain(requestParams, additionalParams)
-        Log.v(TAG, "[END]start(${additionalHeaderParams})")
 
         return this
     }
@@ -90,7 +89,6 @@ class TwitterApiUsersShow(private val db: SQLiteDatabase) : TwitterApiCommon("ht
                         values.put("oauth_token_secret", additionalParams!!["oauth_token_secret"])
                         values.put("my", my)
                         values.put("data", result)
-                        values.put("current", 1)
                         values.put("updated_at", Utility.now())
                         if (insert == true) {
                             values.put("created_at", Utility.now())

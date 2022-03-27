@@ -296,7 +296,7 @@ class TweetRecyclerView(private val userId: Long) : RecyclerView.Adapter<TweetVi
  * @property bottom
  * @constructor Create empty Tweet scroll event
  */
-internal class TweetScrollEvent(private val userId: Long, private val adapter: TweetRecyclerView, private val top: ((Long, TweetRecyclerView, ()->Unit)->Unit)? = null, private val bottom: ((Long, TweetRecyclerView, ()->Unit)->Unit)? = null) : RecyclerView.OnScrollListener()
+internal class TweetScrollEvent(private val userId: Long, private val adapter: TweetRecyclerView, private val top: ((TweetRecyclerView, ()->Unit)->Unit)? = null, private val bottom: ((TweetRecyclerView, ()->Unit)->Unit)? = null) : RecyclerView.OnScrollListener()
 {
     companion object
     {
@@ -336,33 +336,13 @@ internal class TweetScrollEvent(private val userId: Long, private val adapter: T
         bottomLock = false
     }
 
-    private fun reload(recyclerView: RecyclerView)
-    {
-        Log.d(TAG, "reload(${recyclerView})")
-
-        val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-        if (layoutManager.findFirstVisibleItemPosition() == 0) {
-            if (recyclerView.getChildAt(0).top == 0) {
-                Log.d(TAG, "top()")
-                top?.let {
-                    if (topLock == false) {
-                        topLock = true
-                        it(userId, adapter, ::topUnlock)
-                    }
-                }
-            }
-        }
-        if (recyclerView.adapter?.itemCount == layoutManager.findFirstVisibleItemPosition() + recyclerView.childCount) {
-            Log.d(TAG, "bottom()")
-            bottom?.let {
-                if (bottomLock == false) {
-                    bottomLock = true
-                    it(userId, adapter, ::bottomUnlock)
-                }
-            }
-        }
-    }
-
+    /**
+     * On scrolled
+     *
+     * @param recyclerView
+     * @param dx
+     * @param dy
+     */
     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int)
     {
         super.onScrolled(recyclerView, dx, dy)
@@ -370,7 +350,7 @@ internal class TweetScrollEvent(private val userId: Long, private val adapter: T
             top?.let {
                 if (topLock == false) {
                     topLock = true
-                    it(userId, adapter, ::topUnlock)
+                    it(adapter, ::topUnlock)
                 }
             }
         }
@@ -378,21 +358,9 @@ internal class TweetScrollEvent(private val userId: Long, private val adapter: T
             bottom?.let {
                 if (bottomLock == false) {
                     bottomLock = true
-                    it(userId, adapter, ::bottomUnlock)
+                    it(adapter, ::bottomUnlock)
                 }
             }
         }
-    }
-
-    /**
-     * TODO
-     *
-     * @param recyclerView
-     * @param newState
-     */
-    override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int)
-    {
-        super.onScrollStateChanged(recyclerView, newState)
-        Log.v(TAG, "onScrollStateChanged(${recyclerView}, ${newState})")
     }
 }

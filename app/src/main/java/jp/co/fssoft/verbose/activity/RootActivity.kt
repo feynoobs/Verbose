@@ -31,10 +31,9 @@ open class RootActivity : AppCompatActivity()
     /**
      * Get current home tweet
      *
-     * @param userId
      * @return
      */
-    protected fun getCurrentHomeTweet(userId: Long) : List<TweetObject>
+    protected fun getCurrentHomeTweet() : List<TweetObject>
     {
         val tweetObjects = mutableListOf<TweetObject>()
         val query =
@@ -51,7 +50,9 @@ open class RootActivity : AppCompatActivity()
                     t_time_lines.tweet_id
                 DESC
             """
-        database.readableDatabase.rawQuery(query, arrayOf(userId.toString())).use {
+        val preferences = getPreferences(MODE_PRIVATE)
+        val my = preferences.getLong("my", 0L)
+        database.readableDatabase.rawQuery(query, arrayOf(my.toString())).use {
             var movable = it.moveToFirst()
             while (movable) {
                 val tweetObject = Json.jsonDecode(TweetObject.serializer(), it.getString(it.getColumnIndexOrThrow("data")))
@@ -69,12 +70,11 @@ open class RootActivity : AppCompatActivity()
      * @param api
      * @param request
      * @param callback
-     * @param userId
      * @param recursive
      */
-    private fun getTweetsCommon(api: TwitterApiCommon, request: Map<String, String>, callback: (()->Unit)?, userId: Long, recursive: ((Long, Boolean, (()->Unit)?) -> Unit)? = null)
+    private fun getTweetsCommon(api: TwitterApiCommon, request: Map<String, String>, callback: (()->Unit)?, recursive: ((Boolean, (()->Unit)?) -> Unit)? = null)
     {
-        Log.d(TAG, "getTweetsCommon(${api}, ${request}, ${callback}, ${userId}, ${recursive})")
+        Log.d(TAG, "getTweetsCommon(${api}, ${request}, ${callback}, ${recursive})")
         api.start(request).callback = {
             if (it != null) {
                 val jsonList = Json.jsonListDecode(ListSerializer(TweetObject.serializer()), it)
@@ -96,7 +96,7 @@ open class RootActivity : AppCompatActivity()
                 }
                 if (recursive != null) {
                     if (jsonList.isEmpty() != false) {
-                        recursive(userId, true, callback)
+                        recursive(true, callback)
                     }
                     else {
                         callback?.let { it() }
@@ -115,13 +115,12 @@ open class RootActivity : AppCompatActivity()
     /**
      * Get next home tweet
      *
-     * @param userId
      * @param recursive
      * @param callback
      */
-    protected fun getNextHomeTweet(userId: Long, recursive: Boolean = false, callback: (()->Unit)? = null)
+    protected fun getNextHomeTweet(recursive: Boolean = false, callback: (()->Unit)? = null)
     {
-        Log.d(TAG, "getNextHomeTweet(${userId}, ${recursive}, ${callback})")
+        Log.d(TAG, "getNextHomeTweet(${recursive}, ${callback})")
         var tweetMaxId = 0L
         val query =
             """
@@ -139,7 +138,10 @@ open class RootActivity : AppCompatActivity()
                 LIMIT
                     1
             """
-        database.readableDatabase.rawQuery(query, arrayOf(userId.toString())).use {
+        val preferences = getPreferences(MODE_PRIVATE)
+        val my = preferences.getLong("my", 0L)
+
+        database.readableDatabase.rawQuery(query, arrayOf(my.toString())).use {
             if (it.count == 1) {
                 it.moveToFirst()
                 tweetMaxId = it.getLong(it.getColumnIndexOrThrow("tweet_id"))
@@ -156,23 +158,22 @@ open class RootActivity : AppCompatActivity()
             requestMap["since_id"] = tweetMaxId.toString()
         }
         if (recursive == true) {
-            getTweetsCommon(TwitterApiStatusesHomeTimeline(userId, database.writableDatabase), requestMap, callback, userId, ::getNextHomeTweet)
+            getTweetsCommon(TwitterApiStatusesHomeTimeline(my, database.writableDatabase), requestMap, callback, ::getNextHomeTweet)
         }
         else {
-            getTweetsCommon(TwitterApiStatusesHomeTimeline(userId, database.writableDatabase), requestMap, callback, userId)
+            getTweetsCommon(TwitterApiStatusesHomeTimeline(my, database.writableDatabase), requestMap, callback)
         }
     }
 
     /**
      * Get prev home tweet
      *
-     * @param userId
      * @param recursive
      * @param callback
      */
-    protected fun getPrevHomeTweet(userId: Long, recursive: Boolean = false, callback: (()->Unit)? = null)
+    protected fun getPrevHomeTweet(recursive: Boolean = false, callback: (()->Unit)? = null)
     {
-        Log.d(TAG, "[START]getPrevHomeTweet(${userId}, ${recursive})")
+        Log.d(TAG, "[START]getPrevHomeTweet(${recursive})")
         val db = database.writableDatabase
         var tweetMinId = 0L
         val query =
@@ -191,7 +192,10 @@ open class RootActivity : AppCompatActivity()
                 LIMIT
                     1
             """
-        db.rawQuery(query, arrayOf(userId.toString())).use {
+        val preferences = getPreferences(MODE_PRIVATE)
+        val my = preferences.getLong("my", 0L)
+
+        db.rawQuery(query, arrayOf(my.toString())).use {
             if (it.count == 1) {
                 it.moveToFirst()
                 tweetMinId = it.getLong(it.getColumnIndexOrThrow("tweet_id")) - 1
@@ -208,12 +212,11 @@ open class RootActivity : AppCompatActivity()
             requestMap["max_id"] = tweetMinId.toString()
         }
         if (recursive == true) {
-            getTweetsCommon(TwitterApiStatusesHomeTimeline(userId, db), requestMap, callback, userId, ::getPrevHomeTweet)
+            getTweetsCommon(TwitterApiStatusesHomeTimeline(my, db), requestMap, callback, ::getPrevHomeTweet)
         }
         else {
-            getTweetsCommon(TwitterApiStatusesHomeTimeline(userId, db), requestMap, callback, userId)
+            getTweetsCommon(TwitterApiStatusesHomeTimeline(my, db), requestMap, callback)
         }
-        Log.d(TAG, "[END]getPrevHomeTweet(${userId}, ${recursive})")
     }
 
     /**

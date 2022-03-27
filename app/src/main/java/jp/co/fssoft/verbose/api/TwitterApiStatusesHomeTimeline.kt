@@ -10,11 +10,11 @@ import kotlinx.serialization.builtins.ListSerializer
 /**
  * Twitter api statuses home timeline
  *
- * @property userId
+ * @property my
  * @property db
  * @constructor Create empty Twitter api statuses home timeline
  */
-class TwitterApiStatusesHomeTimeline(private val userId: Long, private val db: SQLiteDatabase) : TwitterApiCommon("https://api.twitter.com/1.1/statuses/home_timeline.json", "GET", db)
+class TwitterApiStatusesHomeTimeline(private val my: Long, private val db: SQLiteDatabase) : TwitterApiCommon("https://api.twitter.com/1.1/statuses/home_timeline.json", "GET", db)
 {
     companion object
     {
@@ -55,25 +55,12 @@ class TwitterApiStatusesHomeTimeline(private val userId: Long, private val db: S
                 jsonList.forEach {
                     var insert = true
                     var values = ContentValues()
-                    val userIdFromTweet =
-                        if (it.retweetedTweet == null) {
-                            it.user.id
-                        }
-                        else {
-                            it.retweetedTweet.user.id
-                        }
-                    val userDataFromTweet =
-                        if (it.retweetedTweet == null) {
-                            it.user
-                        }
-                        else {
-                            it.retweetedTweet.user
-                        }
 
-                    values.put("user_id", userIdFromTweet)
-                    values.put("data", Json.jsonEncode(UserObject.serializer(), userDataFromTweet))
+                    // ホームツィートからユーザー情報を切り出して必要なら更新する
+                    values.put("user_id", it.user.id)
+                    values.put("data", Json.jsonEncode(UserObject.serializer(), it.user))
                     values.put("updated_at", Utility.now())
-                    db.rawQuery("SELECT id FROM t_users WHERE user_id = ?", arrayOf(userIdFromTweet.toString())).use {
+                    db.rawQuery("SELECT id FROM t_users WHERE user_id = ?", arrayOf(it.user.id.toString())).use {
                         if (it.count == 1) {
                             insert = false
                         }
@@ -83,7 +70,29 @@ class TwitterApiStatusesHomeTimeline(private val userId: Long, private val db: S
                         db.insert("t_users", null, values)
                     }
                     else {
-                        db.update("t_users", values, "user_id = ?", arrayOf(userIdFromTweet.toString()))
+                        db.update("t_users", values, "user_id = ?", arrayOf(it.user.id.toString()))
+                    }
+
+                    // リツィートの場合はオリジナルユーザーも更新する.いるかな？
+                    // いらない気もする
+                    it.retweetedTweet?.let {
+                        insert = true
+                        values = ContentValues()
+                        values.put("user_id", it.user.id)
+                        values.put("data", Json.jsonEncode(UserObject.serializer(), it.user))
+                        values.put("updated_at", Utility.now())
+                        db.rawQuery("SELECT id FROM t_users WHERE user_id = ?", arrayOf(it.user.id.toString())).use {
+                            if (it.count == 1) {
+                                insert = false
+                            }
+                        }
+                        if (insert == true) {
+                            values.put("created_at", Utility.now())
+                            db.insert("t_users", null, values)
+                        }
+                        else {
+                            db.update("t_users", values, "user_id = ?", arrayOf(it.user.id.toString()))
+                        }
                     }
 
                     insert = true
@@ -109,7 +118,7 @@ class TwitterApiStatusesHomeTimeline(private val userId: Long, private val db: S
 
                     values = ContentValues()
                     values.put("tweet_id", it.id)
-                    values.put("user_id", userId)
+                    values.put("user_id", my)
                     values.put("created_at", Utility.now())
                     values.put("updated_at", Utility.now())
                     db.insert("r_home_tweets", null, values)
