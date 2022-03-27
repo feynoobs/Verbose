@@ -139,7 +139,9 @@ class HomeTimeLineActivity : RootActivity()
          * ユーザーデータがあるか確認する
          * なければ認証
          */
-        database.readableDatabase.rawQuery("SELECT * FROM t_users WHERE current = ?", arrayOf("1")).use {
+        val preferences = getPreferences(MODE_PRIVATE)
+        val my = preferences.getLong("my", 0)
+        database.readableDatabase.rawQuery("SELECT * FROM t_users WHERE my = ?", arrayOf(my.toString())).use {
             if (it.count == 0) {
                 startActivity(Intent(application, AuthenticationActivity::class.java))
             }

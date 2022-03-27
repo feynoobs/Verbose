@@ -39,7 +39,7 @@ class DatabaseHelper(context: Context): SQLiteOpenHelper(context, "verbose.db", 
         )
         db?.execSQL(
             """
-                CREATE UNIQUE INDEX unique_user_id ON t_users (my)
+                CREATE UNIQUE INDEX unique_my ON t_users (my)
             """
         )
 
