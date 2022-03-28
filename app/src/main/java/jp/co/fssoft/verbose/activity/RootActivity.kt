@@ -45,12 +45,12 @@ open class RootActivity : AppCompatActivity()
                 INNER JOIN
                     r_home_tweets
                 ON
-                    r_home_tweets.user_id = ? AND t_time_lines.tweet_id = r_home_tweets.tweet_id
+                    r_home_tweets.my = ? AND t_time_lines.tweet_id = r_home_tweets.tweet_id
                 ORDER BY
                     t_time_lines.tweet_id
                 DESC
             """
-        val preferences = getPreferences(MODE_PRIVATE)
+        val preferences = getSharedPreferences("common", MODE_PRIVATE)
         val my = preferences.getLong("my", 0L)
         database.readableDatabase.rawQuery(query, arrayOf(my.toString())).use {
             var movable = it.moveToFirst()
@@ -131,14 +131,14 @@ open class RootActivity : AppCompatActivity()
                 INNER JOIN
                     r_home_tweets
                 ON
-                    r_home_tweets.user_id = ? AND t_time_lines.tweet_id = r_home_tweets.tweet_id
+                    r_home_tweets.my = ? AND t_time_lines.tweet_id = r_home_tweets.tweet_id
                 ORDER BY
                     t_time_lines.tweet_id
                 DESC
                 LIMIT
                     1
             """
-        val preferences = getPreferences(MODE_PRIVATE)
+        val preferences = getSharedPreferences("common", MODE_PRIVATE)
         val my = preferences.getLong("my", 0L)
 
         database.readableDatabase.rawQuery(query, arrayOf(my.toString())).use {
@@ -185,14 +185,14 @@ open class RootActivity : AppCompatActivity()
                 INNER JOIN
                     r_home_tweets
                 ON
-                    r_home_tweets.user_id = ? AND t_time_lines.tweet_id = r_home_tweets.tweet_id
+                    r_home_tweets.my = ? AND t_time_lines.tweet_id = r_home_tweets.tweet_id
                 ORDER BY
                     t_time_lines.tweet_id
                 ASC
                 LIMIT
                     1
             """
-        val preferences = getPreferences(MODE_PRIVATE)
+        val preferences = getSharedPreferences("common", MODE_PRIVATE)
         val my = preferences.getLong("my", 0L)
 
         db.rawQuery(query, arrayOf(my.toString())).use {

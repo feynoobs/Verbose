@@ -10,9 +10,11 @@ import java.lang.Exception
  *
  * @property id
  * @property db
- * @constructor Create empty Twitter api statuses unretweet
+ * @constructor
+ *
+ * @param my
  */
-class TwitterApiStatusesUnretweet(private val id: Long, private val db: SQLiteDatabase) : TwitterApiCommon("https://api.twitter.com/1.1/statuses/unretweet/${id}.json", "POST", db)
+class TwitterApiStatusesUnretweet(my: Long, private val id: Long, private val db: SQLiteDatabase) : TwitterApiCommon(my, "https://api.twitter.com/1.1/statuses/unretweet/${id}.json", "POST", db)
 {
     companion object
     {

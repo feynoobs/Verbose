@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import jp.co.fssoft.verbose.R
 import jp.co.fssoft.verbose.api.TwitterApiAccessToken
 import jp.co.fssoft.verbose.api.TwitterApiCommon
+import jp.co.fssoft.verbose.api.TwitterApiCommon.Companion.MY_NOT_SPECIFIED
 import jp.co.fssoft.verbose.api.TwitterApiRequestToken
 import jp.co.fssoft.verbose.api.TwitterApiUsersShow
 import jp.co.fssoft.verbose.database.DatabaseHelper
@@ -51,11 +52,11 @@ class AuthenticationActivity : AppCompatActivity()
         TwitterApiAccessToken(database.readableDatabase).start(resultMap).callback = {
             val resultMap = Utility.splitQuery(it!!).toMutableMap()
             resultMap.remove("screen_name")
-            TwitterApiUsersShow(database.writableDatabase).start(resultMap).callback = {
+            TwitterApiUsersShow(MY_NOT_SPECIFIED, database.writableDatabase).start(resultMap).callback = {
                 database.readableDatabase.rawQuery("SELECT MAX(my) as max FROM t_users", null).use {
                     it.moveToFirst()
                     val my = it.getLong(it.getColumnIndexOrThrow("max"))
-                    val edit = getPreferences(MODE_PRIVATE).edit()
+                    val edit = getSharedPreferences("common", MODE_PRIVATE).edit()
                     edit.putLong("my", my)
                     edit.commit()
                 }

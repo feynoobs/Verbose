@@ -17,12 +17,13 @@ import javax.net.ssl.HttpsURLConnection
 /**
  * Twitter api common
  *
+ * @property key
  * @property entryPoint
  * @property method
  * @property db
  * @constructor Create empty Twitter api common
  */
-abstract class TwitterApiCommon(private val entryPoint: String, private val method: String, private val db: SQLiteDatabase)
+abstract class TwitterApiCommon(private val key: Long, private val entryPoint: String, private val method: String, private val db: SQLiteDatabase)
 {
     companion object
     {
@@ -45,6 +46,8 @@ abstract class TwitterApiCommon(private val entryPoint: String, private val meth
          * C a l l b a c k_u r l
          */
         public const val CALLBACK_URL = "twinida://"
+
+        public const val MY_NOT_SPECIFIED = 0L
     }
 
     /**
@@ -97,7 +100,7 @@ abstract class TwitterApiCommon(private val entryPoint: String, private val meth
                 }
             }
             requestParams?.let { headerParams.putAll(it) }
-            db.rawQuery("SELECT * FROM t_users WHERE current = ?", arrayOf("1")).use {
+            db.rawQuery("SELECT * FROM t_users WHERE my = ?", arrayOf(key.toString())).use {
                 if (it.count == 1) {
                     it.moveToFirst()
                     headerParams["oauth_token"] = it.getString(it.getColumnIndexOrThrow("oauth_token"))

@@ -9,7 +9,7 @@ import android.util.Log
  * @property db
  * @constructor Create empty Twitter api access token
  */
-class TwitterApiAccessToken(private val db: SQLiteDatabase) : TwitterApiCommon("https://api.twitter.com/oauth/access_token", "POST", db)
+class TwitterApiAccessToken(db: SQLiteDatabase) : TwitterApiCommon(MY_NOT_SPECIFIED, "https://api.twitter.com/oauth/access_token", "POST", db)
 {
     companion object
     {

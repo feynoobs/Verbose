@@ -27,7 +27,7 @@ class PostTweetService : Service()
     companion object
     {
         /**
-         *
+         * Tag
          */
         private val TAG = PostTweetService::class.qualifiedName
     }
@@ -69,6 +69,7 @@ class PostTweetService : Service()
         if (replyId != -1L) {
             bodyParams["in_reply_to_status_id"] = replyId.toString()
         }
+        val my = intent.getLongExtra("my", 0)
 
         val images = intent.getStringArrayListExtra("images")
         if (images?.size != 0) {
@@ -87,7 +88,8 @@ class PostTweetService : Service()
                 val params = mapOf(
                     "media_data" to android.util.Base64.encodeToString(data.toByteArray(), android.util.Base64.NO_WRAP)
                 )
-                TwitterApiMediaUpload(DatabaseHelper(applicationContext).readableDatabase).start(params).callback = {
+
+                TwitterApiMediaUpload(my, DatabaseHelper(applicationContext).readableDatabase).start(params).callback = {
                     Log.e(TAG, it!!)
                     val postData = Json.jsonDecode(ImageObject.serializer(), it)
                     medias.add(postData.id)
@@ -98,13 +100,13 @@ class PostTweetService : Service()
                         }
                         mediaIds.removeSuffix(",")
                         bodyParams["media_ids"] = mediaIds
-                        postTweet(bodyParams)
+                        postTweet(my, bodyParams)
                     }
                 }
             }
         }
         else {
-            postTweet(bodyParams)
+            postTweet(my, bodyParams)
         }
 
         startForeground(1, notification)
@@ -116,11 +118,12 @@ class PostTweetService : Service()
     /**
      * Post tweet
      *
+     * @param my
      * @param param
      */
-    private fun postTweet(param: Map<String, String>)
+    private fun postTweet(my: Long, param: Map<String, String>)
     {
-        TwitterApiStatusesUpdate(DatabaseHelper(applicationContext).readableDatabase).start(param).callback =  {
+        TwitterApiStatusesUpdate(my, DatabaseHelper(applicationContext).readableDatabase).start(param).callback =  {
             Handler(Looper.getMainLooper()).post {
                 if (it == null) {
                     Toast.makeText(applicationContext, getString(R.string.post_tweet_fail), Toast.LENGTH_LONG).show()

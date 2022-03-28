@@ -14,7 +14,7 @@ import kotlinx.serialization.builtins.ListSerializer
  * @property db
  * @constructor Create empty Twitter api statuses home timeline
  */
-class TwitterApiStatusesHomeTimeline(private val my: Long, private val db: SQLiteDatabase) : TwitterApiCommon("https://api.twitter.com/1.1/statuses/home_timeline.json", "GET", db)
+class TwitterApiStatusesHomeTimeline(private val my: Long, private val db: SQLiteDatabase) : TwitterApiCommon(my, "https://api.twitter.com/1.1/statuses/home_timeline.json", "GET", db)
 {
     companion object
     {
@@ -118,7 +118,7 @@ class TwitterApiStatusesHomeTimeline(private val my: Long, private val db: SQLit
 
                     values = ContentValues()
                     values.put("tweet_id", it.id)
-                    values.put("user_id", my)
+                    values.put("my", my)
                     values.put("created_at", Utility.now())
                     values.put("updated_at", Utility.now())
                     db.insert("r_home_tweets", null, values)

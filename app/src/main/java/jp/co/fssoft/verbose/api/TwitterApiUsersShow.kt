@@ -10,9 +10,11 @@ import jp.co.fssoft.verbose.utility.Utility
  * Twitter api users show
  *
  * @property db
- * @constructor Create empty Twitter api users show
+ * @constructor
+ *
+ * @param my
  */
-class TwitterApiUsersShow(private val db: SQLiteDatabase) : TwitterApiCommon("https://api.twitter.com/1.1/users/show.json", "GET", db)
+class TwitterApiUsersShow(my: Long, private val db: SQLiteDatabase) : TwitterApiCommon(my, "https://api.twitter.com/1.1/users/show.json", "GET", db)
 {
     companion object
     {
@@ -35,7 +37,7 @@ class TwitterApiUsersShow(private val db: SQLiteDatabase) : TwitterApiCommon("ht
      */
     override fun start(additionalHeaderParams: Map<String, String>?) : TwitterApiCommon
     {
-        Log.v(TAG, "[START]start(${additionalHeaderParams})")
+        Log.v(TAG, "start(${additionalHeaderParams})")
 
         val requestParams = mapOf("user_id" to additionalHeaderParams!!["user_id"]!!)
         /***********************************************
@@ -61,7 +63,7 @@ class TwitterApiUsersShow(private val db: SQLiteDatabase) : TwitterApiCommon("ht
      */
     override fun finish(result: String?)
     {
-        Log.v(TAG, "[START]finish(${result})")
+        Log.v(TAG, "finish(${result})")
         result?.let {
             db.beginTransaction()
             try {
@@ -79,11 +81,7 @@ class TwitterApiUsersShow(private val db: SQLiteDatabase) : TwitterApiCommon("ht
                         it.moveToFirst()
                         val my = it.getLong(it.getColumnIndexOrThrow("max")) + 1
 
-                        var values = ContentValues()
-                        values.put("current", 0)
-                        db.update("t_users", values, "current = ?", arrayOf("1"))
-
-                        values = ContentValues()
+                        val values = ContentValues()
                         values.put("user_id", json.id)
                         values.put("oauth_token", additionalParams!!["oauth_token"]!!)
                         values.put("oauth_token_secret", additionalParams!!["oauth_token_secret"])
@@ -123,6 +121,5 @@ class TwitterApiUsersShow(private val db: SQLiteDatabase) : TwitterApiCommon("ht
         }
 
         callback?.let { it(result) }
-        Log.v(TAG, "[END]finish(${result})")
     }
 }

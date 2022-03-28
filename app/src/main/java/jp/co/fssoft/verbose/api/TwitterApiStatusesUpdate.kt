@@ -4,12 +4,14 @@ import android.database.sqlite.SQLiteDatabase
 import android.util.Log
 
 /**
- * Twitter api update
+ * Twitter api statuses update
  *
- * @property db
- * @constructor Create empty Twitter api update
+ * @constructor
+ *
+ * @param my
+ * @param db
  */
-class TwitterApiStatusesUpdate(private val db: SQLiteDatabase) : TwitterApiCommon("https://api.twitter.com/1.1/statuses/update.json", "POST", db)
+class TwitterApiStatusesUpdate(my: Long, db: SQLiteDatabase) : TwitterApiCommon(my, "https://api.twitter.com/1.1/statuses/update.json", "POST", db)
 {
     /**
      * Companion

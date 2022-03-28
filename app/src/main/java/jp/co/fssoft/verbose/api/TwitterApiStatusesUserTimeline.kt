@@ -11,14 +11,16 @@ import kotlinx.serialization.builtins.ListSerializer
  * Twitter api statuses user timeline
  *
  * @property db
- * @constructor Create empty Twitter api statuses user timeline
+ * @constructor
+ *
+ * @param my
  */
-class TwitterApiStatusesUserTimeline(private val db: SQLiteDatabase) : TwitterApiCommon("https://api.twitter.com/1.1/statuses/user_timeline.json", "GET", db)
+class TwitterApiStatusesUserTimeline(my: Long, private val db: SQLiteDatabase) : TwitterApiCommon(my, "https://api.twitter.com/1.1/statuses/user_timeline.json", "GET", db)
 {
     companion object
     {
         /**
-         *
+         * Tag
          */
         private val TAG = TwitterApiStatusesUserTimeline::class.qualifiedName
     }
@@ -31,9 +33,8 @@ class TwitterApiStatusesUserTimeline(private val db: SQLiteDatabase) : TwitterAp
      */
     override fun start(additionalHeaderParams: Map<String, String>?) : TwitterApiCommon
     {
-        Log.v(TAG, "[START]start(${additionalHeaderParams})")
+        Log.v(TAG, "start(${additionalHeaderParams})")
         startMain(additionalHeaderParams)
-        Log.v(TAG, "[END]start(${additionalHeaderParams})")
 
         return this
     }
@@ -45,7 +46,7 @@ class TwitterApiStatusesUserTimeline(private val db: SQLiteDatabase) : TwitterAp
      */
     override fun finish(result: String?)
     {
-        Log.v(TAG, "[START]finish(${result})")
+        Log.v(TAG, "finish(${result})")
         result?.let {
             val jsonList = Json.jsonListDecode(ListSerializer(TweetObject.serializer()), it)
             db.beginTransaction()
@@ -111,7 +112,5 @@ class TwitterApiStatusesUserTimeline(private val db: SQLiteDatabase) : TwitterAp
             }
         }
         callback?.let { it(result) }
-
-        Log.v(TAG, "[END]finish(${result})")
     }
 }

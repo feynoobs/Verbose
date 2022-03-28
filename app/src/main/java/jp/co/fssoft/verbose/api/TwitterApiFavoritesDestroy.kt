@@ -10,9 +10,11 @@ import java.lang.Exception
  * Twitter api favorites destroy
  *
  * @property db
- * @constructor Create empty Twitter api favorites destroy
+ * @constructor
+ *
+ * @param my
  */
-class TwitterApiFavoritesDestroy(private val db: SQLiteDatabase) : TwitterApiCommon("https://api.twitter.com/1.1/favorites/destroy.json", "POST", db)
+class TwitterApiFavoritesDestroy(my:Long, private val db: SQLiteDatabase) : TwitterApiCommon(my, "https://api.twitter.com/1.1/favorites/destroy.json", "POST", db)
 {
     companion object
     {

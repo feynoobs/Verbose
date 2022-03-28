@@ -10,9 +10,11 @@ import java.lang.Exception
  * Twitter api favorites create
  *
  * @property db
- * @constructor Create empty Twitter api favorites create
+ * @constructor
+ *
+ * @param my
  */
-class TwitterApiFavoritesCreate(private val db: SQLiteDatabase) : TwitterApiCommon("https://api.twitter.com/1.1/favorites/create.json", "POST", db)
+class TwitterApiFavoritesCreate(my:Long, private val db: SQLiteDatabase) : TwitterApiCommon(my, "https://api.twitter.com/1.1/favorites/create.json", "POST", db)
 {
     companion object
     {

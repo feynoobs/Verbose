@@ -6,11 +6,13 @@ import android.util.Log
 /**
  * Twitter api statuses destroy
  *
- * @property id
- * @property db
- * @constructor Create empty Twitter api statuses destroy
+ * @constructor
+ *
+ * @param my
+ * @param id
+ * @param db
  */
-class TwitterApiStatusesDestroy(private val id: Long, private val db: SQLiteDatabase) : TwitterApiCommon("https://api.twitter.com/1.1/statuses/destroy/${id}.json", "POST", db)
+class TwitterApiStatusesDestroy(my: Long, id: Long, db: SQLiteDatabase) : TwitterApiCommon(my, "https://api.twitter.com/1.1/statuses/destroy/${id}.json", "POST", db)
 {
     companion object
     {

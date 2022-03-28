@@ -139,7 +139,7 @@ class HomeTimeLineActivity : RootActivity()
          * ユーザーデータがあるか確認する
          * なければ認証
          */
-        val preferences = getPreferences(MODE_PRIVATE)
+        val preferences = getSharedPreferences("common", MODE_PRIVATE)
         val my = preferences.getLong("my", 0)
         database.readableDatabase.rawQuery("SELECT * FROM t_users WHERE my = ?", arrayOf(my.toString())).use {
             if (it.count == 0) {

@@ -3,7 +3,15 @@ package jp.co.fssoft.verbose.api
 import android.database.sqlite.SQLiteDatabase
 import android.util.Log
 
-class TwitterApiMediaUpload(db: SQLiteDatabase) : TwitterApiCommon("https://upload.twitter.com/1.1/media/upload.json", "POST", db)
+/**
+ * Twitter api media upload
+ *
+ * @constructor
+ *
+ * @param my
+ * @param db
+ */
+class TwitterApiMediaUpload(my:Long, db: SQLiteDatabase) : TwitterApiCommon(my, "https://upload.twitter.com/1.1/media/upload.json", "POST", db)
 {
     companion object
     {

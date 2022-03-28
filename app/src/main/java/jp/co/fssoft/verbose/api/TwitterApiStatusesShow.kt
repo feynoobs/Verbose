@@ -1,6 +1,5 @@
 package jp.co.fssoft.verbose.api
 
-
 import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
 import android.util.Log
@@ -11,9 +10,11 @@ import java.lang.Exception
  * Twitter api statuses show
  *
  * @property db
- * @constructor Create empty Twitter api statuses show
+ * @constructor
+ *
+ * @param my
  */
-class TwitterApiStatusesShow(private val db: SQLiteDatabase) : TwitterApiCommon("https://api.twitter.com/1.1/statuses/show.json", "GET", db)
+class TwitterApiStatusesShow(my:Long, private val db: SQLiteDatabase) : TwitterApiCommon(my, "https://api.twitter.com/1.1/statuses/show.json", "GET", db)
 {
     companion object
     {
