@@ -1,5 +1,6 @@
 package jp.co.fssoft.verbose.activity
 
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.webkit.URLUtil
@@ -12,6 +13,8 @@ import jp.co.fssoft.verbose.database.DatabaseHelper
 import jp.co.fssoft.verbose.utility.Imager
 import jp.co.fssoft.verbose.utility.Json
 import kotlinx.serialization.builtins.ListSerializer
+import java.io.File
+import java.util.jar.Manifest
 
 /**
  * Root activity
@@ -83,14 +86,14 @@ open class RootActivity : AppCompatActivity()
                     it.retweetedTweet?.let {
                         tweetObject = it
                     }
-                    Imager().saveImage(applicationContext, Imager.Companion.ImagePrefix.USER, tweetObject.user.profileImageUrl)
+                    Imager().saveImage(applicationContext, tweetObject.user.profileImageUrl, Imager.Companion.ImagePrefix.USER)
                     tweetObject.user.profileBannerUrl?.let {
                         val file = URLUtil.guessFileName(it, null, null).removeSuffix(".bin")
-                        Imager().saveImage(applicationContext, Imager.Companion.ImagePrefix.BANNER, "${it}/300x100", file)
+                        Imager().saveImage(applicationContext, "${it}/300x100", Imager.Companion.ImagePrefix.BANNER, file)
                     }
                     tweetObject.extendedEntities?.let {
                         it.medias.forEach {
-                            Imager().saveImage(applicationContext, Imager.Companion.ImagePrefix.PICTURE, it.mediaUrl)
+                            Imager().saveImage(applicationContext, it.mediaUrl, Imager.Companion.ImagePrefix.PICTURE)
                         }
                     }
                 }
@@ -235,6 +238,12 @@ open class RootActivity : AppCompatActivity()
     {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "[START]onCreate(${savedInstanceState})")
+        requestPermissions(arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE, android.Manifest.permission.READ_EXTERNAL_STORAGE), 1001)
         setContentView(R.layout.root_activity)
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray)
+    {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 }

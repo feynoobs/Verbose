@@ -58,7 +58,7 @@ class Imager
      * @param saveAs
      * @return
      */
-    private fun getPathFromUrl(url: String, saveAs: String? = null) : String
+    public fun getPathFromUrl(url: String, saveAs: String? = null) : String
     {
         var path = URL(url).path
         saveAs?.let {
@@ -67,83 +67,89 @@ class Imager
         return path
     }
 
-    /**
-     * Create nested dir
-     *
-     * @param context
-     * @param prefix
-     * @param path
-     */
-    private fun createNestedDir(context: Context, prefix: ImagePrefix, path: String)
+    internal open class SaveImageRunnable(private val imager: Imager, private val context: Context, private val url: String, private val prefix: ImagePrefix, private val saveAs: String?) : Runnable
     {
-        File("${context.cacheDir}/${prefix}/${File(path).parent}").mkdirs()
-    }
+        /**
+         * Run
+         *
+         */
+        override fun run()
+        {
+            val con = URL(url).openConnection() as HttpsURLConnection
+            con.addRequestProperty("Accept-Encoding", "gzip")
+            con.connect()
+            val encoding = con.getHeaderField("Content-Encoding")
+            val stream =
+                if (encoding != null) {
+                    GZIPInputStream(con.inputStream)
+                } else {
+                    con.inputStream
+                }
+            /***********************************************
+             * 中途半端なImageが読み出されないようにtmpに保存して
+             * 完了したらリネームする
+             */
+            val tmpFileObject = File.createTempFile(prefix.toString(), "tmp", context.cacheDir)
+            FileOutputStream(tmpFileObject).use {
+                while (true) {
+                    val c = stream.read()
+                    if (c == -1) {
+                        break
+                    }
+                    it.write(c)
+                }
+            }
+            val fileObject = File("${context.cacheDir}/${prefix}/${imager.getPathFromUrl(url, saveAs)}")
+            val hage = fileObject.parentFile.mkdirs()
+            tmpFileObject.renameTo(fileObject)
+            synchronized(keepRequest) {
+                if (keepRequest.size > 0) {
+                    keepRequest.removeAt(0).start()
+                }
+            }
 
+            synchronized(loadRequest) {
+                loadRequest.forEach { (k, v) ->
+                    if (k == url) {
+                        v.forEach {
+                            it(fileObject)
+                        }
+                    }
+                }
+                loadRequest.remove(url)
+            }
+        }
+    }
     /**
      * Save image
      *
      * @param context
-     * @param prefix
      * @param url
+     * @param prefix
      * @param saveAs
      */
-    public fun saveImage(context: Context, prefix: ImagePrefix, url: String, saveAs: String? = null)
+    public fun saveImage(context: Context, url: String, prefix: ImagePrefix, saveAs: String? = null)
     {
-        Log.v(TAG, "saveImage(${context}, ${prefix}, ${url}, ${saveAs})")
-        val file = getPathFromUrl(url, saveAs)
+        Log.v(TAG, "saveImage(${context}, ${url}, ${prefix}, ${saveAs})")
 
+        val thread = Thread(object : SaveImageRunnable(this, context, url, prefix, saveAs) {
+        })
+        val file = getPathFromUrl(url, saveAs)
         val fileObject = File("${context.cacheDir}/${prefix}/${file}")
         if (fileObject.exists() == false) {
-            val runnable = Runnable {
-                val con = URL(url).openConnection() as HttpsURLConnection
-                con.addRequestProperty("Accept-Encoding", "gzip")
-                con.connect()
-                val encoding = con.getHeaderField("Content-Encoding")
-                val stream =
-                    if (encoding != null) {
-                        GZIPInputStream(con.inputStream)
-                    } else {
-                        con.inputStream
-                    }
-                /***********************************************
-                 * 中途半端なImageが読み出されないようにtmpに保存して
-                 * 完了したらリネームする
-                 */
-                val tmpFileObject = File.createTempFile(prefix.toString(), "tmp", context.cacheDir)
-                FileOutputStream(tmpFileObject).use {
-                    while (true) {
-                        val c = stream.read()
-                        if (c == -1) {
-                            break
-                        }
-                        it.write(c)
-                    }
+            synchronized(keepRequest) {
+                if (keepRequest.size <= MAX) {
+                    thread.start()
                 }
-                tmpFileObject.renameTo(fileObject)
-                synchronized(keepRequest) {
-                    if (keepRequest.size > 0) {
-                        keepRequest.removeAt(0).start()
-                    }
-                }
-
-                synchronized(loadRequest) {
-                    loadRequest.forEach { (k, v) ->
-                        if (k == file) {
-                            v.forEach {
-                                it(fileObject)
-                            }
-                        }
-                    }
-                    loadRequest.remove(file)
-                }
-            }
-            val thread = Thread(runnable)
-            if (keepRequest.size <= MAX) {
-                thread.start()
-            }
-            else {
-                synchronized(keepRequest) {
+                else {
                     keepRequest.add(thread)
+                }
+            }
+        }
+        else {
+            synchronized(keepRequest) {
+                if (keepRequest.size <= MAX) {
+                    thread.start()
                 }
             }
         }
@@ -162,17 +168,15 @@ class Imager
     {
         Log.v(TAG, "loadImage(${context}, ${url}, ${prefix}, ${callback})")
 
-        val file = "${context.cacheDir}/${prefix}/${getPathFromUrl(url)}"
-        val fileObject = File(file)
+        val fileObject = File("${context.cacheDir}/${prefix}/${getPathFromUrl(url)}")
         if (fileObject.exists() == true) {
             callback(fileObject)
         }
         else {
-            Thread {
-                synchronized (loadRequest) {
-                    loadRequest[file]?.add(callback)
-                }
-            }.start()
+            synchronized (loadRequest) {
+                loadRequest[url]?.add(callback)
+            }
+            saveImage(context, url, prefix)
         }
     }
 }
