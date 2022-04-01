@@ -60,6 +60,8 @@ class Imager
      */
     public fun getPathFromUrl(url: String, saveAs: String? = null) : String
     {
+        Log.v(TAG, "getPathFromUrl(${url}, ${saveAs})")
+
         var path = URL(url).path
         saveAs?.let {
             path = "${File(path).parent}/${it}"
@@ -67,14 +69,31 @@ class Imager
         return path
     }
 
+    /**
+     * Save image runnable
+     *
+     * @property imager
+     * @property context
+     * @property url
+     * @property prefix
+     * @property saveAs
+     * @constructor Create empty Save image runnable
+     */
     internal open class SaveImageRunnable(private val imager: Imager, private val context: Context, private val url: String, private val prefix: ImagePrefix, private val saveAs: String?) : Runnable
     {
+        companion object
+        {
+            private val TAG = SaveImageRunnable::class.qualifiedName
+        }
+
         /**
          * Run
          *
          */
         override fun run()
         {
+            Log.v(TAG, "loadImage(${imager}, ${context}, ${url}, ${prefix}, ${saveAs})")
+
             val con = URL(url).openConnection() as HttpsURLConnection
             con.addRequestProperty("Accept-Encoding", "gzip")
             con.connect()
@@ -100,7 +119,6 @@ class Imager
                 }
             }
             val fileObject = File("${context.cacheDir}/${prefix}/${imager.getPathFromUrl(url, saveAs)}")
-            val hage = fileObject.parentFile.mkdirs()
             tmpFileObject.renameTo(fileObject)
             synchronized(keepRequest) {
                 if (keepRequest.size > 0) {
@@ -120,6 +138,7 @@ class Imager
             }
         }
     }
+
     /**
      * Save image
      *
@@ -132,8 +151,7 @@ class Imager
     {
         Log.v(TAG, "saveImage(${context}, ${url}, ${prefix}, ${saveAs})")
 
-        val thread = Thread(object : SaveImageRunnable(this, context, url, prefix, saveAs) {
-        })
+        val thread = Thread(SaveImageRunnable(this, context, url, prefix, saveAs))
         val file = getPathFromUrl(url, saveAs)
         val fileObject = File("${context.cacheDir}/${prefix}/${file}")
         if (fileObject.exists() == false) {
