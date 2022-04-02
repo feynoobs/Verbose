@@ -1,6 +1,5 @@
 package jp.co.fssoft.verbose.activity
 
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.webkit.URLUtil
@@ -13,8 +12,6 @@ import jp.co.fssoft.verbose.database.DatabaseHelper
 import jp.co.fssoft.verbose.utility.Imager
 import jp.co.fssoft.verbose.utility.Json
 import kotlinx.serialization.builtins.ListSerializer
-import java.io.File
-import java.util.jar.Manifest
 
 /**
  * Root activity

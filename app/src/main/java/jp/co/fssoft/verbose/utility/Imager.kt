@@ -193,7 +193,12 @@ class Imager
         }
         else {
             synchronized (loadRequest) {
-                loadRequest[url]?.add(callback)
+                if (loadRequest.containsKey(url) == false) {
+                    loadRequest[url] = mutableListOf(callback)
+                }
+                else {
+                    loadRequest[url]?.add(callback)
+                }
             }
             saveImage(context, url, prefix)
         }
