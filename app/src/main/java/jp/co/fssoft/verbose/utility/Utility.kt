@@ -9,8 +9,9 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 
 /**
- * TODO
+ * Utility
  *
+ * @constructor Create empty Utility
  */
 class Utility
 {
@@ -22,7 +23,7 @@ class Utility
         private val TAG = Utility::class.qualifiedName
 
         /**
-         * TODO
+         * Split query
          *
          * @param query
          * @return
@@ -42,7 +43,7 @@ class Utility
         }
 
         /**
-         * TODO
+         * Create fuzzy date time
          *
          * @param dateTime
          * @return
@@ -85,24 +86,22 @@ class Utility
             return fuzzyDateTime
         }
 
-
         /**
-         * TODO
+         * Now
          *
          * @return
          */
         public fun now(): String
         {
-            Log.v(TAG, "[START]now()")
+            Log.v(TAG, "now()")
             val date = Date()
             val format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-            Log.v(TAG, "[END]now()")
 
             return format.format(date)
         }
 
         /**
-         * TODO
+         * Resize bitmap
          *
          * @param source
          * @param length
@@ -110,27 +109,26 @@ class Utility
          */
         public fun resizeBitmap(source: Bitmap, length: Int) : Bitmap
         {
-            Log.v(TAG, "[START]resizeBitmap(${source})")
+            Log.v(TAG, "resizeBitmap(${source}, ${length})")
             val size = Math.max(source.width, source.height)
             val aspect = length.toDouble() / size.toDouble()
             val bmp = Bitmap.createScaledBitmap(source, (source.width * aspect).toInt(), (source.height * aspect).toInt(), true)
             if (source !== bmp) {
                 source.recycle()
             }
-            Log.v(TAG, "[END]resizeBitmap(${source})")
 
             return bmp
         }
 
         /**
-         * TODO
+         * Circle transform
          *
          * @param source
          * @return
          */
         public fun circleTransform(source: Bitmap) : Bitmap
         {
-            Log.v(TAG, "[START]circleTransform(${source})")
+            Log.v(TAG, "circleTransform(${source})")
             val size = Math.min(source.width, source.height)
             val x = (source.width - size) / 2
             val y = (source.height - size) / 2
@@ -147,7 +145,6 @@ class Utility
                 source.recycle()
             }
             squaredBitmap.recycle()
-            Log.v(TAG, "[END]circleTransform(${source})")
 
             return bitmap
         }

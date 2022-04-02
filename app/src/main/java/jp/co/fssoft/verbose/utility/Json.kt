@@ -6,20 +6,21 @@ import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.json.Json
 
 /**
- * TODO
+ * Json
  *
+ * @constructor Create empty Json
  */
 class Json
 {
     companion object
     {
         /**
-         *
+         * Tag
          */
         private val TAG = Json::class.qualifiedName
 
         /**
-         * TODO
+         * Json encode
          *
          * @param T
          * @param serializer
@@ -28,12 +29,12 @@ class Json
          */
         public fun <T> jsonEncode(serializer: SerializationStrategy<T>, values: T): String
         {
-            Log.v(TAG, "[START]jsonEncode(${serializer}, ${values})")
+            Log.v(TAG, "jsonEncode(${serializer}, ${values})")
             return Json { encodeDefaults = true }.encodeToString(serializer, values)
         }
 
         /**
-         * TODO
+         * Json list encode
          *
          * @param T
          * @param serializer
@@ -42,13 +43,12 @@ class Json
          */
         public fun <T> jsonListEncode(serializer: KSerializer<List<T>>, values: List<T>): String
         {
-            Log.v(TAG, "[START]jsonListEncode(${serializer}, ${values})")
+            Log.v(TAG, "jsonListEncode(${serializer}, ${values})")
             return Json { encodeDefaults = true }.encodeToString(serializer, values)
         }
 
-
         /**
-         * TODO
+         * Json decode
          *
          * @param T
          * @param deserializer
@@ -57,21 +57,21 @@ class Json
          */
         public fun <T> jsonDecode(deserializer: KSerializer<T>, json: String): T
         {
-            Log.v(TAG, "[START]jsonDecode(${deserializer}, ${json})")
+            Log.v(TAG, "jsonDecode(${deserializer}, ${json})")
             return Json {ignoreUnknownKeys = true; isLenient = true; useArrayPolymorphism = true}.decodeFromString(deserializer, json)
         }
 
         /**
-         * TODO
+         * Json list decode
          *
          * @param T
-         * @param serializer
+         * @param deserializer
          * @param json
          * @return
          */
         public fun <T> jsonListDecode(deserializer: KSerializer<List<T>>, json: String): List<T>
         {
-            Log.v(TAG, "[START]jsonDecode(${deserializer}, ${json})")
+            Log.v(TAG, "jsonDecode(${deserializer}, ${json})")
             return Json {ignoreUnknownKeys = true; isLenient = true; useArrayPolymorphism = true}.decodeFromString(deserializer, json)
         }
     }
