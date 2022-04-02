@@ -238,12 +238,6 @@ open class RootActivity : AppCompatActivity()
     {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "[START]onCreate(${savedInstanceState})")
-        requestPermissions(arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE, android.Manifest.permission.READ_EXTERNAL_STORAGE), 1001)
         setContentView(R.layout.root_activity)
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray)
-    {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 }

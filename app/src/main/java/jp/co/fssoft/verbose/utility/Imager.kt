@@ -79,7 +79,7 @@ class Imager
      * @property saveAs
      * @constructor Create empty Save image runnable
      */
-    internal open class SaveImageRunnable(private val imager: Imager, private val context: Context, private val url: String, private val prefix: ImagePrefix, private val saveAs: String?) : Runnable
+    internal class SaveImageRunnable(private val imager: Imager, private val context: Context, private val url: String, private val prefix: ImagePrefix, private val saveAs: String?) : Runnable
     {
         companion object
         {
@@ -119,6 +119,7 @@ class Imager
                 }
             }
             val fileObject = File("${context.cacheDir}/${prefix}/${imager.getPathFromUrl(url, saveAs)}")
+            fileObject.parentFile.mkdirs()
             tmpFileObject.renameTo(fileObject)
             synchronized(keepRequest) {
                 if (keepRequest.size > 0) {
