@@ -80,6 +80,8 @@ class DatabaseHelper(context: Context): SQLiteOpenHelper(context, "verbose.db", 
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         tweet_id INTEGER NOT NULL,                  -- ツィートID
                         my INTEGER DEFAULT NULL,                    -- シーケンシャルな番号
+                        is_favorited INTEGER NOT NULL DEFAULT 0,    -- 0:いいね済み/1:いいねしてない
+                        is_retweeted INTEGER NOT NULL DEFAULT 0,    -- 0:RTしてない/1:RTした
                         created_at TEXT NOT NULL,
                         updated_at TEXT NOT NULL  
                     )

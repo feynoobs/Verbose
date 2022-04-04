@@ -119,6 +119,18 @@ class TwitterApiStatusesHomeTimeline(private val my: Long, private val db: SQLit
                     values = ContentValues()
                     values.put("tweet_id", it.id)
                     values.put("my", my)
+                    if (it.isFavorited == false) {
+                        values.put("is_favorited", 0)
+                    }
+                    else {
+                        values.put("is_favorited", 1)
+                    }
+                    if (it.isRetweeted == false) {
+                        values.put("is_retweeted", 0)
+                    }
+                    else {
+                        values.put("is_retweeted", 1)
+                    }
                     values.put("created_at", Utility.now())
                     values.put("updated_at", Utility.now())
                     db.insert("r_home_tweets", null, values)

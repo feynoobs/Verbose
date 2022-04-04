@@ -2,7 +2,6 @@ package jp.co.fssoft.verbose.activity
 
 import android.os.Bundle
 import android.util.Log
-import android.webkit.URLUtil
 import androidx.appcompat.app.AppCompatActivity
 import jp.co.fssoft.verbose.R
 import jp.co.fssoft.verbose.api.TweetObject
@@ -11,6 +10,7 @@ import jp.co.fssoft.verbose.api.TwitterApiStatusesHomeTimeline
 import jp.co.fssoft.verbose.database.DatabaseHelper
 import jp.co.fssoft.verbose.utility.Imager
 import jp.co.fssoft.verbose.utility.Json
+import jp.co.fssoft.verbose.widget.ExTweetObject
 import kotlinx.serialization.builtins.ListSerializer
 
 /**
@@ -33,13 +33,13 @@ open class RootActivity : AppCompatActivity()
      *
      * @return
      */
-    protected fun getCurrentHomeTweet() : List<TweetObject>
+    protected fun getCurrentHomeTweet() : List<ExTweetObject>
     {
-        val tweetObjects = mutableListOf<TweetObject>()
+        val tweetObjects = mutableListOf<ExTweetObject>()
         val query =
             """
                 SELECT 
-                    t_time_lines.user_id, t_time_lines.data 
+                    t_time_lines.data, r_home_tweets.is_favorited, r_home_tweets.is_retweeted
                 FROM 
                     t_time_lines
                 INNER JOIN
@@ -56,7 +56,10 @@ open class RootActivity : AppCompatActivity()
             var movable = it.moveToFirst()
             while (movable) {
                 val tweetObject = Json.jsonDecode(TweetObject.serializer(), it.getString(it.getColumnIndexOrThrow("data")))
-                tweetObjects.add(tweetObject)
+                val isFavorited = it.getInt(it.getColumnIndexOrThrow("is_favorited")) != 0
+                val isRetweeted = it.getInt(it.getColumnIndexOrThrow("is_retweeted")) != 0
+                tweetObjects.add(ExTweetObject(tweetObject, isFavorited, isRetweeted))
+
                 movable = it.moveToNext()
             }
         }
@@ -84,10 +87,12 @@ open class RootActivity : AppCompatActivity()
                         tweetObject = it
                     }
                     Imager().saveImage(applicationContext, tweetObject.user.profileImageUrl, Imager.Companion.ImagePrefix.USER)
+                    /*
                     tweetObject.user.profileBannerUrl?.let {
                         val file = URLUtil.guessFileName(it, null, null).removeSuffix(".bin")
                         Imager().saveImage(applicationContext, "${it}/300x100", Imager.Companion.ImagePrefix.BANNER, file)
                     }
+                    */
                     tweetObject.extendedEntities?.let {
                         it.medias.forEach {
                             Imager().saveImage(applicationContext, it.mediaUrl, Imager.Companion.ImagePrefix.PICTURE)

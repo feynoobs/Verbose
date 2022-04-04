@@ -85,11 +85,11 @@ class TwitterApiUsersShow(my: Long, private val db: SQLiteDatabase) : TwitterApi
                         values.put("user_id", json.id)
                         values.put("oauth_token", additionalParams!!["oauth_token"]!!)
                         values.put("oauth_token_secret", additionalParams!!["oauth_token_secret"])
-                        values.put("my", my)
                         values.put("data", result)
                         values.put("updated_at", Utility.now())
                         if (insert == true) {
                             values.put("created_at", Utility.now())
+                            values.put("my", my)
                             db.insert("t_users", null, values)
                         }
                         else {

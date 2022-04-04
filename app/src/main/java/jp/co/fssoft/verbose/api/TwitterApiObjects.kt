@@ -23,7 +23,7 @@ data class TweetObject(
     @SerialName("favorite_count") val favorites: Int,
     @SerialName("favorited") val isFavorited: Boolean,
     @SerialName("possibly_sensitive") val isSensitive: Boolean = false,
-    val retweeted: Boolean
+    @SerialName("retweeted")  val isRetweeted: Boolean
 )
 
 @Serializable

@@ -33,7 +33,7 @@ class HomeTimeLineActivity : RootActivity()
     /**
      * Upper scroll
      *
-     * @param userId
+     * @param adapter
      * @param callback
      * @receiver
      */
@@ -44,7 +44,7 @@ class HomeTimeLineActivity : RootActivity()
         getNextHomeTweet(false) {
             adapter.tweetObjects = getCurrentHomeTweet()
             for (i in 0 until adapter.tweetObjects.size) {
-                if (adapter.tweetObjects[i].id > prevData[0].id) {
+                if (adapter.tweetObjects[i].data.id > prevData[0].data.id) {
                     ++diff
                 }
                 else {
@@ -77,7 +77,7 @@ class HomeTimeLineActivity : RootActivity()
         getPrevHomeTweet(false) {
             adapter.tweetObjects = getCurrentHomeTweet()
             for (i in (adapter.tweetObjects.size -1) downTo 0) {
-                if (adapter.tweetObjects[i].id < prevData[prevData.size - 1].id) {
+                if (adapter.tweetObjects[i].data.id < prevData[prevData.size - 1].data.id) {
                     ++diff
                 }
                 else {
@@ -151,7 +151,9 @@ class HomeTimeLineActivity : RootActivity()
                     setHasFixedSize(true)
                     layoutManager = LinearLayoutManager(this@HomeTimeLineActivity, LinearLayoutManager.VERTICAL, false)
                     val userId = it.getLong(it.getColumnIndexOrThrow("user_id"))
-                    adapter = TweetRecyclerView(userId)
+                    adapter = TweetRecyclerView(applicationContext, userId) {commonId, type, positopn ->
+
+                    }
                     addItemDecoration(DividerItemDecoration(applicationContext, DividerItemDecoration.VERTICAL))
                     addOnScrollListener(TweetScrollEvent(userId, adapter as TweetRecyclerView, ::upperScroll, ::lowerScroll))
 

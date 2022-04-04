@@ -2,6 +2,10 @@ package jp.co.fssoft.verbose.widget
 
 import android.content.Context
 import android.graphics.BitmapFactory
+import android.graphics.Typeface
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.StyleSpan
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,14 +13,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.*
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import jp.co.fssoft.verbose.R
 import jp.co.fssoft.verbose.api.TweetObject
 import jp.co.fssoft.verbose.utility.Imager
 import jp.co.fssoft.verbose.utility.Utility
-import org.w3c.dom.Text
 import java.io.FileInputStream
+
+data class ExTweetObject(val data: TweetObject, val isFavorited: Boolean, val isRetweeted: Boolean)
 
 /**
  * Tweet view holder
@@ -44,11 +48,6 @@ class TweetViewHolder(view: View) : RecyclerView.ViewHolder(view)
      * Name text
      */
     val nameText: TextView = view.findViewById(R.id.tweet_recycler_view_user_name)
-
-    /**
-     * At name text
-     */
-    val atNameText: TextView = view.findViewById(R.id.tweet_recycler_view_at_user_name)
 
     /**
      * Main text
@@ -169,9 +168,7 @@ class TweetViewHolder(view: View) : RecyclerView.ViewHolder(view)
         otherBtn.layoutParams.width = (size.widthPixels * 0.84 * 0.2 * 0.25).toInt()
         otherBtn.layoutParams.height = (size.widthPixels * 0.84 * 0.2 * 0.25).toInt()
 
-        nameText.layoutParams.width = (size.widthPixels * 0.84 * 0.36).toInt()
-
-        atNameText.layoutParams.width = (size.widthPixels * 0.84 * 0.36).toInt()
+        nameText.layoutParams.width = (size.widthPixels * 0.84 * 0.72).toInt()
     }
 }
 
@@ -180,7 +177,7 @@ class TweetViewHolder(view: View) : RecyclerView.ViewHolder(view)
  *
  * @constructor Create empty Tweet recycle view
  */
-class TweetRecyclerView(private val userId: Long) : RecyclerView.Adapter<TweetViewHolder>()
+class TweetRecyclerView(private val context: Context, private val userId: Long, private val callback: (Long, ButtonType, Int)->Unit) : RecyclerView.Adapter<TweetViewHolder>()
 {
     companion object
     {
@@ -188,12 +185,31 @@ class TweetRecyclerView(private val userId: Long) : RecyclerView.Adapter<TweetVi
          * T a g
          */
         private val TAG = TweetRecyclerView::class.qualifiedName
+
+        /**
+         * Button type
+         *
+         * @property effect
+         * @constructor Create empty Button type
+         */
+        enum class ButtonType(private val effect: Int)
+        {
+            FAVORITE(1),
+            REMOVE_FAVORITE(2),
+            RETWEET(3),
+            REMOVE_RETWEET(4),
+            SHARE(5),
+            USER(6),
+            REPLY(7),
+            OTHER_MY(8),
+            OTHER_OTHER(9)
+        }
     }
 
     /**
      * Tweet objects
      */
-    public var tweetObjects: List<TweetObject> = mutableListOf()
+    public var tweetObjects: List<ExTweetObject> = mutableListOf()
 
     /**
      * On create view holder
@@ -219,30 +235,41 @@ class TweetRecyclerView(private val userId: Long) : RecyclerView.Adapter<TweetVi
         Log.v(TAG, "onBindViewHolder(${holder}, ${position})")
         val tweet = tweetObjects[position]
 
-        holder.nameText.text =
-            if (tweet.retweetedTweet == null) {
-                tweet.user.name
+        val spanName =
+            if (tweet.data.retweetedTweet == null) {
+                SpannableString("${tweet.data.user.name}${context.getString(R.string.at)}${tweet.data.user.screen_name}")
             }
             else {
-                tweet.retweetedTweet.user.name
+                SpannableString("${tweet.data.retweetedTweet.user.name}${context.getString(R.string.at)}${tweet.data.retweetedTweet.user.screen_name}")
             }
-        holder.atNameText.text =
-            if (tweet.retweetedTweet == null) {
-                tweet.user.screen_name
+        val effectLength =
+            if (tweet.data.retweetedTweet == null) {
+                tweet.data.user.name.length
             }
             else {
-                tweet.retweetedTweet.user.screen_name
+                tweet.data.retweetedTweet.user.name.length
             }
-        holder.timeText.text = Utility.createFuzzyDateTime(tweet.createdAt)
+        spanName.setSpan(StyleSpan(Typeface.BOLD), 0, effectLength, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        holder.nameText.text = spanName
+        holder.nameText.setOnClickListener {
+            if (tweet.data.retweetedTweet == null) {
+                callback(tweet.data.user.id, ButtonType.USER, position)
+            }
+            else {
+                callback(tweet.data.retweetedTweet.user.id, ButtonType.USER, position)
+            }
+        }
+
+        holder.timeText.text = Utility.createFuzzyDateTime(tweet.data.createdAt)
         holder.mainText.text =
-            if (tweet.retweetedTweet == null) {
-                tweet.text
+            if (tweet.data.retweetedTweet == null) {
+                tweet.data.text
             }
             else {
-                tweet.retweetedTweet.text
+                tweet.data.retweetedTweet.text
             }
-        if (tweet.retweetedTweet == null) {
-            Imager().loadImage(holder.icon.context, tweet.user.profileImageUrl, Imager.Companion.ImagePrefix.USER) {
+        if (tweet.data.retweetedTweet == null) {
+            Imager().loadImage(holder.icon.context, tweet.data.user.profileImageUrl, Imager.Companion.ImagePrefix.USER) {
                 holder.icon.post {
                     holder.icon.setImageBitmap(Utility.circleTransform(BitmapFactory.decodeStream(
                         FileInputStream(it)
@@ -251,30 +278,55 @@ class TweetRecyclerView(private val userId: Long) : RecyclerView.Adapter<TweetVi
             }
         }
         else {
-            Imager().loadImage(holder.icon.context, tweet.retweetedTweet.user.profileImageUrl, Imager.Companion.ImagePrefix.USER) {
+            Imager().loadImage(holder.icon.context, tweet.data.retweetedTweet.user.profileImageUrl, Imager.Companion.ImagePrefix.USER) {
                 holder.icon.post {
                     holder.icon.setImageBitmap(Utility.circleTransform(BitmapFactory.decodeStream(FileInputStream(it))))
                 }
             }
         }
+        holder.icon.setOnClickListener {
+            if (tweet.data.retweetedTweet == null) {
+                callback(tweet.data.user.id, ButtonType.USER, position)
+            }
+            else {
+                callback(tweet.data.retweetedTweet.user.id, ButtonType.USER, position)
+            }
+        }
+
+        holder.replyBtn.setOnClickListener {
+            callback(tweet.data.id, ButtonType.REPLY, position)
+        }
+
+        holder.retweetBtn.setImageResource(R.drawable.tweet_retweet)
+        if (tweet.isRetweeted == true) {
+            holder.retweetBtn.setImageResource(R.drawable.tweet_retweeted)
+        }
+        holder.retweetText.text = ""
+        if (tweet.data.retweetedTweet == null) {
+            if (tweet.data.retweets != 0) {
+                holder.retweetText.text = String.format("%,d", tweet.data.retweets)
+            }
+        }
+        else {
+            if (tweet.data.retweetedTweet.retweets != 0) {
+                holder.retweetText.text = String.format("%,d", tweet.data.retweetedTweet.retweets)
+            }
+        }
+
         holder.favoriteBtn.setImageResource(R.drawable.tweet_favorite)
         if (tweet.isFavorited == true) {
             holder.favoriteBtn.setImageResource(R.drawable.tweet_favorited)
         }
         holder.favoriteText.text = ""
-        if (tweet.retweetedTweet == null) {
-            if (tweet.favorites != 0) {
-                holder.favoriteText.text = String.format("%,d", tweet.favorites)
+        if (tweet.data.retweetedTweet == null) {
+            if (tweet.data.favorites != 0) {
+                holder.favoriteText.text = String.format("%,d", tweet.data.favorites)
             }
         }
         else {
-            if (tweet.retweetedTweet.favorites != 0) {
-                holder.favoriteText.text = String.format("%,d", tweet.retweetedTweet?.favorites)
+            if (tweet.data.retweetedTweet.favorites != 0) {
+                holder.favoriteText.text = String.format("%,d", tweet.data.retweetedTweet.favorites)
             }
-        }
-        holder.retweetBtn.setImageResource(R.drawable.tweet_retweet)
-        if (tweet.retweeted == true) {
-            holder.retweetBtn.setImageResource(R.drawable.tweet_retweeted)
         }
     }
 
