@@ -53,6 +53,8 @@ class DatabaseHelper(context: Context): SQLiteOpenHelper(context, "verbose.db", 
                         user_id INTEGER NOT NULL,               -- ユーザーID
                         
                         data JSON,                              -- ダウンロードされたJSONデータ
+                        ogp_card_type INTEGER DEFAULT NULL,     -- OGP CARD SIZE NULL:OPGなし/1:small/2:large
+                        ogp_card_desc TEXT DEFAULT NULL,        -- OGP CARD SIZE NULL:OPGなし/NULL以外:ディスクリプション
                         
                         created_at TEXT NOT NULL,
                         updated_at TEXT NOT NULL  
@@ -74,6 +76,28 @@ class DatabaseHelper(context: Context): SQLiteOpenHelper(context, "verbose.db", 
                 CREATE INDEX index_user_id ON t_time_lines (user_id)
             """
         )
+        db?.execSQL(
+            """
+                    CREATE TABLE t_ogps(
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        
+                        tweet_id INTEGER NOT NULL,              -- ツィートID
+
+                        ogp_card_type INTEGER NOT NULL,         -- OGP CARD SIZE 1:small/2:large
+                        ogp_card_desc TEXT NOT NULL,            -- OGP CARD SIZE NULL:OPGなし/NULL以外:ディスクリプション
+                        ogp_image_url TEXT DEFAULT NULL,        -- OGP CARD URL NULL:画像なし/NULL以外:URLあり
+                        
+                        created_at TEXT NOT NULL,
+                        updated_at TEXT NOT NULL  
+                    )
+            """
+        )
+        db?.execSQL(
+            """
+                CREATE UNIQUE INDEX unique_tweet_id ON t_ogps (tweet_id)
+            """
+        )
+
         db?.execSQL(
             """
                     CREATE TABLE r_home_tweets(

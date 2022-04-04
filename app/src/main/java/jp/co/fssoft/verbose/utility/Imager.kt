@@ -47,7 +47,8 @@ class Imager
         {
             USER("user"),
             BANNER("banner"),
-            PICTURE("picture")
+            PICTURE("picture"),
+            OGP("ogp")
         }
     }
 
