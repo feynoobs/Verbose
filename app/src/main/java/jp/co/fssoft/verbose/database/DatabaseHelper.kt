@@ -54,7 +54,8 @@ class DatabaseHelper(context: Context): SQLiteOpenHelper(context, "verbose.db", 
                         
                         data JSON,                              -- ダウンロードされたJSONデータ
                         ogp_card_type INTEGER DEFAULT NULL,     -- OGP CARD SIZE NULL:OPGなし/1:small/2:large
-                        ogp_card_desc TEXT DEFAULT NULL,        -- OGP CARD SIZE NULL:OPGなし/NULL以外:ディスクリプション
+                        ogp_card_desc TEXT DEFAULT NULL,        -- OGP description NULL:OPGなし/NULL以外:ディスクリプション
+                        ogp_image_url TEXT DEFAULT NULL,        -- OGP image url NULL:イメージなし/NULL以外:画像URL
                         
                         created_at TEXT NOT NULL,
                         updated_at TEXT NOT NULL  
