@@ -91,7 +91,7 @@ class DatabaseHelper(context: Context): SQLiteOpenHelper(context, "verbose.db", 
         )
         db?.execSQL(
             """
-                CREATE UNIQUE INDEX unique_user_id_tweet_id ON r_home_tweets (my, tweet_id)
+                CREATE UNIQUE INDEX unique_my_tweet_id ON r_home_tweets (my, tweet_id)
             """
         )
 
@@ -109,7 +109,7 @@ class DatabaseHelper(context: Context): SQLiteOpenHelper(context, "verbose.db", 
         )
         db?.execSQL(
             """
-                CREATE UNIQUE INDEX unique_user_id_tweet_id ON t_tweet_actions (my, tweet_id)
+                CREATE UNIQUE INDEX unique_my_tweet_id ON t_tweet_actions (my, tweet_id)
             """
         )
     }
