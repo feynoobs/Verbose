@@ -2,16 +2,22 @@ package jp.co.fssoft.verbose.activity
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.Adapter
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.RecyclerView
 import jp.co.fssoft.verbose.R
 import jp.co.fssoft.verbose.api.TweetObject
 import jp.co.fssoft.verbose.api.TwitterApiCommon
+import jp.co.fssoft.verbose.api.TwitterApiFavoritesCreate
 import jp.co.fssoft.verbose.api.TwitterApiStatusesHomeTimeline
 import jp.co.fssoft.verbose.database.DatabaseHelper
 import jp.co.fssoft.verbose.utility.Imager
 import jp.co.fssoft.verbose.utility.Json
 import jp.co.fssoft.verbose.widget.ExTweetObject
+import jp.co.fssoft.verbose.widget.TweetRecyclerView
+import jp.co.fssoft.verbose.widget.TweetViewHolder
 import kotlinx.serialization.builtins.ListSerializer
+import java.text.FieldPosition
 
 /**
  * Root activity
@@ -222,6 +228,33 @@ open class RootActivity : AppCompatActivity()
         else {
             getTweetsCommon(TwitterApiStatusesHomeTimeline(my, db), requestMap, callback)
         }
+    }
+
+    /**
+     * Status change common
+     *
+     * @param api
+     * @param id
+     * @param position
+     */
+    private fun statusChangeCommon(api: TwitterApiCommon, id: Long, position: Int)
+    {
+        api.start(mapOf("id" to id.toString())).callback = {
+
+        }
+    }
+
+    /**
+     * Favorite handler
+     *
+     * @param tweetId
+     * @param position
+     */
+    protected fun favoriteHandler(adapter: RecyclerView.Adapter<TweetViewHolder>, tweetId: Long, position: Int)
+    {
+        val preferences = getSharedPreferences("common", MODE_PRIVATE)
+        val my = preferences.getLong("my", 0L)
+        statusChangeCommon(TwitterApiFavoritesCreate(my, database.writableDatabase), tweetId, position)
     }
 
     /**

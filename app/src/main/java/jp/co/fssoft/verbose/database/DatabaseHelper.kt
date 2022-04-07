@@ -25,7 +25,7 @@ class DatabaseHelper(context: Context): SQLiteOpenHelper(context, "verbose.db", 
                         oauth_token_secret TEXT DEFAULT NULL,   -- Twitter認証してもらう.NULLなら自分以外
                         my INTEGER DEFAULT NULL,                -- 自分の場合シーケンシャルな番号.他人ならNULL
                         
-                        data JSON,                              -- ダウンロードされたJSONデータ
+                        data JSON NOT NULL,                     -- ダウンロードされたJSONデータ
                         
                         created_at TEXT NOT NULL,
                         updated_at TEXT NOT NULL 
@@ -52,7 +52,7 @@ class DatabaseHelper(context: Context): SQLiteOpenHelper(context, "verbose.db", 
                         reply_tweet_id INTEGER DEFAULT NULL,    -- リプライの場合付与されるオリジナルツィートID
                         user_id INTEGER NOT NULL,               -- ユーザーID
                         
-                        data JSON,                              -- ダウンロードされたJSONデータ
+                        data JSON NOT NULL,                     -- ダウンロードされたJSONデータ
                         ogp_card_type INTEGER DEFAULT NULL,     -- OGP CARD SIZE NULL:OPGなし/1:small/2:large
                         ogp_card_desc TEXT DEFAULT NULL,        -- OGP description NULL:OPGなし/NULL以外:ディスクリプション
                         ogp_image_url TEXT DEFAULT NULL,        -- OGP image url NULL:イメージなし/NULL以外:画像URL
@@ -77,36 +77,13 @@ class DatabaseHelper(context: Context): SQLiteOpenHelper(context, "verbose.db", 
                 CREATE INDEX index_user_id ON t_time_lines (user_id)
             """
         )
-        db?.execSQL(
-            """
-                    CREATE TABLE t_ogps(
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        
-                        tweet_id INTEGER NOT NULL,              -- ツィートID
-
-                        ogp_card_type INTEGER NOT NULL,         -- OGP CARD SIZE 1:small/2:large
-                        ogp_card_desc TEXT NOT NULL,            -- OGP CARD SIZE NULL:OPGなし/NULL以外:ディスクリプション
-                        ogp_image_url TEXT DEFAULT NULL,        -- OGP CARD URL NULL:画像なし/NULL以外:URLあり
-                        
-                        created_at TEXT NOT NULL,
-                        updated_at TEXT NOT NULL  
-                    )
-            """
-        )
-        db?.execSQL(
-            """
-                CREATE UNIQUE INDEX unique_tweet_id ON t_ogps (tweet_id)
-            """
-        )
 
         db?.execSQL(
             """
                     CREATE TABLE r_home_tweets(
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        tweet_id INTEGER NOT NULL,                  -- ツィートID
-                        my INTEGER DEFAULT NULL,                    -- シーケンシャルな番号
-                        is_favorited INTEGER NOT NULL DEFAULT 0,    -- 0:いいね済み/1:いいねしてない
-                        is_retweeted INTEGER NOT NULL DEFAULT 0,    -- 0:RTしてない/1:RTした
+                        tweet_id INTEGER NOT NULL,              -- ツィートID
+                        my INTEGER NOT NULL,                    -- シーケンシャルな番号
                         created_at TEXT NOT NULL,
                         updated_at TEXT NOT NULL  
                     )
@@ -117,6 +94,25 @@ class DatabaseHelper(context: Context): SQLiteOpenHelper(context, "verbose.db", 
                 CREATE UNIQUE INDEX unique_user_id_tweet_id ON r_home_tweets (my, tweet_id)
             """
         )
+
+        db?.execSQL(
+            """
+                    CREATE TABLE t_tweet_actions(
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        type INTEGER NOT NULL DEFAULT 1,        -- 1:いいね/2:RT
+                        tweet_id INTEGER NOT NULL,              -- ツィートID
+                        my INTEGER NOT NULL,                    -- シーケンシャルなユーザー番号
+                        created_at TEXT NOT NULL,
+                        updated_at TEXT NOT NULL  
+                    )
+            """
+        )
+        db?.execSQL(
+            """
+                CREATE UNIQUE INDEX unique_user_id_tweet_id ON r_home_tweets (my, tweet_id)
+            """
+        )
+
     }
 
     /**

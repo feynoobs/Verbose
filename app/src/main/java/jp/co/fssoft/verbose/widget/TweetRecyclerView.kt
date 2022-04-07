@@ -301,6 +301,14 @@ class TweetRecyclerView(private val context: Context, private val userId: Long, 
         if (tweet.isRetweeted == true) {
             holder.retweetBtn.setImageResource(R.drawable.tweet_retweeted)
         }
+        holder.retweetBtn.setOnClickListener {
+            if (tweet.isRetweeted == true) {
+                callback(tweet.data.retweetedTweet!!.id, ButtonType.REMOVE_RETWEET, position)
+            }
+            else {
+                callback(tweet.data.id, ButtonType.RETWEET, position)
+            }
+        }
         holder.retweetText.text = ""
         if (tweet.data.retweetedTweet == null) {
             if (tweet.data.retweets != 0) {
@@ -316,6 +324,14 @@ class TweetRecyclerView(private val context: Context, private val userId: Long, 
         holder.favoriteBtn.setImageResource(R.drawable.tweet_favorite)
         if (tweet.isFavorited == true) {
             holder.favoriteBtn.setImageResource(R.drawable.tweet_favorited)
+        }
+        holder.favoriteBtn.setOnClickListener {
+            if (tweet.isFavorited == true) {
+                callback(tweet.data.id, ButtonType.REMOVE_FAVORITE, position)
+            }
+            else {
+                callback(tweet.data.id, ButtonType.FAVORITE, position)
+            }
         }
         holder.favoriteText.text = ""
         if (tweet.data.retweetedTweet == null) {

@@ -14,6 +14,7 @@ import jp.co.fssoft.verbose.R
 import jp.co.fssoft.verbose.utility.Utility
 import jp.co.fssoft.verbose.widget.TweetRecyclerView
 import jp.co.fssoft.verbose.widget.TweetScrollEvent
+import jp.co.fssoft.verbose.widget.TweetViewHolder
 
 /**
  * Home time line activity
@@ -152,6 +153,10 @@ class HomeTimeLineActivity : RootActivity()
                     layoutManager = LinearLayoutManager(this@HomeTimeLineActivity, LinearLayoutManager.VERTICAL, false)
                     val userId = it.getLong(it.getColumnIndexOrThrow("user_id"))
                     adapter = TweetRecyclerView(applicationContext, userId) {commonId, type, positopn ->
+                        when (type) {
+                            TweetRecyclerView.Companion.ButtonType.FAVORITE -> {
+                                favoriteHandler(adapter as RecyclerView.Adapter<TweetViewHolder>, commonId, positopn) }
+                        }
 
                     }
                     addItemDecoration(DividerItemDecoration(applicationContext, DividerItemDecoration.VERTICAL))
